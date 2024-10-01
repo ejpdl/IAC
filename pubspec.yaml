@@ -1,0 +1,30 @@
+name: internet_access_control
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.1.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  fluid_bottom_nav_bar: ^1.4.0
+  image_picker: ^0.8.4+4
+  http: ^1.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  fonts: 
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Bold.ttf
+    - family: NotoSerif
+      fonts: 
+        - asset: fonts/NotoSerif-SemiBoldItalic.ttf
