@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:internet_access_control/loginScreen.dart';
 
 class RegScreen extends StatefulWidget {
@@ -57,10 +59,11 @@ class _RegScreenState extends State<RegScreen> {
                     children: [
                       const SizedBox(height: 20),
                       const TextField(
+                        style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: Icon(
-                              Icons.check,
-                              color: Colors.grey,
+                              Icons.abc_outlined,
+                              color: Color.fromARGB(255, 226, 221, 221),
                             ),
                             label: Text(
                               'Full Name',
@@ -72,6 +75,7 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                       const SizedBox(height: 20),
                       const TextField(
+                        style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                           suffixIcon: Icon(
                             Icons.check,
@@ -89,6 +93,7 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
+                        style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
                               icon: Icon(_obscureText
@@ -112,6 +117,7 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
+                        style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
                               icon: Icon(_obscureTextConfirm
@@ -129,6 +135,7 @@ class _RegScreenState extends State<RegScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Color.fromARGB(255, 255, 255, 255),
+                                
                               ),
                             )),
                         obscureText: _obscureTextConfirm,
