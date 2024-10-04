@@ -14,6 +14,11 @@ class _RegScreenState extends State<RegScreen> {
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
 
+  final TextEditingController _fullnameController = TextEditingController();
+  final TextEditingController _sidController = TextEditingController();
+  final TextEditingController _passController = TextEditingController();
+  final TextEditingController _confirmpassController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,9 +63,10 @@ class _RegScreenState extends State<RegScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(height: 20),
-                      const TextField(
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
+                      TextField(
+                        controller: _fullnameController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
                             suffixIcon: Icon(
                               Icons.abc_outlined,
                               color: Color.fromARGB(255, 226, 221, 221),
@@ -74,9 +80,10 @@ class _RegScreenState extends State<RegScreen> {
                             )),
                       ),
                       const SizedBox(height: 20),
-                      const TextField(
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
+                      TextField(
+                        controller: _sidController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
                           suffixIcon: Icon(
                             Icons.check,
                             color: Colors.grey,
@@ -93,6 +100,7 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
+                        controller: _passController,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
@@ -117,6 +125,7 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
+                        controller: _confirmpassController,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
@@ -135,7 +144,6 @@ class _RegScreenState extends State<RegScreen> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Color.fromARGB(255, 255, 255, 255),
-                                
                               ),
                             )),
                         obscureText: _obscureTextConfirm,
@@ -154,39 +162,76 @@ class _RegScreenState extends State<RegScreen> {
                         child: Center(
                           child: TextButton(
                             onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text(
-                                    'Success',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  content: const Text(
-                                    'Successfully Registered!',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  backgroundColor: const Color.fromARGB(255, 128, 0, 0),
-                                  actions: [
-                                    TextButton (
-                                      onPressed: () {
-                                        Navigator.of(context).pop();
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const LoginScreen(),
-                                          ),
-                                        );
-                                      },
-                                      child: const Text(
-                                        'OK',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
+                              String fullname = _fullnameController.text;
+                              String sid = _sidController.text;
+                              String pass = _passController.text;
+                              String confirmpass = _confirmpassController.text;
 
+                              if (pass == confirmpass) {
+                                createaccountButton(fullname, sid, pass);
+
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text(
+                                      'Success',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    content: const Text(
+                                      'Successfully Registered!',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 128, 0, 0),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const LoginScreen(),
+                                            ),
+                                          );
+                                        },
+                                        child: const Text(
+                                          'OK',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              } else {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text(
+                                      'Error',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    content: const Text(
+                                      'Password do not match!',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 128, 0, 0),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text(
+                                          'OK',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                            },
                             child: const Text(
                               'Create Account',
                               style: TextStyle(
@@ -208,4 +253,19 @@ class _RegScreenState extends State<RegScreen> {
       ),
     );
   }
+}
+
+createaccountButton(
+    String fullname, String sid, String pass) async {
+  final response = await http.post(
+    Uri.parse('http://127.0.0.1:3000/userdata/login'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'fullname': fullname,
+      'sid': sid,
+      'pass': pass,
+    }),
+  );
 }
