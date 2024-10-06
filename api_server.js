@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 const cors = require('cors');
 const moment = require('moment');
+const bcrypt = require('bcrypt');
+const salt = 10;
 
 const app = express();
 
@@ -37,6 +39,92 @@ connection.connect((err) => {
     }
 
     console.log(`Successfully connected to the MySQL Database`);
+
+});
+
+
+// LOG IN
+app.post('/userdata/login', (req, res) => {
+
+    const { email, password } = req.body; 
+
+    const query = `SELECT * FROM college_credentials WHERE Student_ID = ?`;
+
+    connection.query(query, [email], (err, rows) => {
+
+        if(err){
+
+            return res.status(500).json({ error: err.message });
+        }
+
+        if(rows.length > 0){
+            
+            const user = rows[0];
+
+            bcrypt.compare(password, user.Password, (err, result) => {
+
+                if(err){
+
+                    return res.status(500).json({ error: err.message });
+
+                }
+
+                if(result){
+
+                    res.status(200).json(user);
+
+                }else{
+
+                    res.status(401).json({ msg: `Invalid ID Number or Password` });
+
+                }
+
+            });
+
+        }else{
+
+            res.status(401).json({ msg: 'Invalid email or password' });
+
+        }
+
+    });
+
+});
+
+
+// REGISTER
+app.post(`/userdata/register`, (req, res) => {
+
+    const { sid, fullname, password } = req.body;
+
+    bcrypt.hash(password, salt, (err, hashed) => {
+
+        if(err){
+
+            return res.status(500).json({ error: err.message });
+
+        }
+
+        const query = `INSERT INTO college_credentials (Student_ID, Full_Name, Password) VALUES (?, ?, ?)`;
+
+        connection.query(query, [sid, fullname, hashed], (err, result) => {
+
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }   
+
+            res.status(201).json({ msg: `User successfully registered` });
+
+        });
+
+        console.log(`Student ID provided: ${sid}`);
+        console.log(`Full Name provided: ${fullname}`);
+        console.log(`Password provided: ${password}`);
+        console.log(`Password after hashed: ${hashed}`);
+
+    });
 
 });
 
