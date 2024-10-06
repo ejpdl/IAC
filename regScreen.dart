@@ -13,11 +13,82 @@ class RegScreen extends StatefulWidget {
 class _RegScreenState extends State<RegScreen> {
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
-
   final TextEditingController _fullnameController = TextEditingController();
   final TextEditingController _sidController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
-  final TextEditingController _confirmpassController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  bool _isLoading = false;
+
+  // Function to handle registration logic
+  Future<void> _register() async {
+    final String fullname = _fullnameController.text;
+    final String sid = _sidController.text;
+    final String password = _passwordController.text;
+    final String confirmPassword = _confirmPasswordController.text;
+
+    // Simple Validation
+    if (fullname.isEmpty || sid.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in all fields')),
+      );
+      return;
+    }
+
+    if (password != confirmPassword) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passwords do not match')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      var url = "http://127.0.0.1:3000/userdata/register";
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'fullname': fullname,
+          'sid': sid,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        // Successful Registration
+        final data = jsonDecode(response.body);
+
+        // Handle successful registration
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()), // Redirect to login
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Successfully Registered!')),
+        );
+      } else {
+        // Show error message if registration fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Registration Failed: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +129,7 @@ class _RegScreenState extends State<RegScreen> {
               width: double.infinity,
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 18.0, right: 18),
+                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -75,7 +146,7 @@ class _RegScreenState extends State<RegScreen> {
                               'Full Name',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 255, 255, 255),
+                                color: Colors.white,
                               ),
                             )),
                       ),
@@ -92,7 +163,7 @@ class _RegScreenState extends State<RegScreen> {
                             'Student ID',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(255, 255, 255, 255),
+                              color: Colors.white,
                             ),
                           ),
                           hintText: 'A**-****',
@@ -100,8 +171,8 @@ class _RegScreenState extends State<RegScreen> {
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: _passController,
-                        style: TextStyle(color: Colors.white),
+                        controller: _passwordController,
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
                               icon: Icon(_obscureText
@@ -118,15 +189,15 @@ class _RegScreenState extends State<RegScreen> {
                               'Password',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 255, 255, 255),
+                                color: Colors.white,
                               ),
                             )),
                         obscureText: _obscureText,
                       ),
                       const SizedBox(height: 20),
                       TextField(
-                        controller: _confirmpassController,
-                        style: TextStyle(color: Colors.white),
+                        controller: _confirmPasswordController,
+                        style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
                             suffixIcon: IconButton(
                               icon: Icon(_obscureTextConfirm
@@ -143,7 +214,7 @@ class _RegScreenState extends State<RegScreen> {
                               'Confirm Password',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 255, 255, 255),
+                                color: Colors.white,
                               ),
                             )),
                         obscureText: _obscureTextConfirm,
@@ -162,75 +233,7 @@ class _RegScreenState extends State<RegScreen> {
                         child: Center(
                           child: TextButton(
                             onPressed: () {
-                              String fullname = _fullnameController.text;
-                              String sid = _sidController.text;
-                              String pass = _passController.text;
-                              String confirmpass = _confirmpassController.text;
-
-                              if (pass == confirmpass) {
-                                createaccountButton(fullname, sid, pass);
-
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text(
-                                      'Success',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    content: const Text(
-                                      'Successfully Registered!',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 128, 0, 0),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          Navigator.pushReplacement(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const LoginScreen(),
-                                            ),
-                                          );
-                                        },
-                                        child: const Text(
-                                          'OK',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text(
-                                      'Error',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    content: const Text(
-                                      'Password do not match!',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    backgroundColor:
-                                        const Color.fromARGB(255, 128, 0, 0),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                        child: const Text(
-                                          'OK',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
+                              _register(); // Call the _register function
                             },
                             child: const Text(
                               'Create Account',
@@ -253,19 +256,4 @@ class _RegScreenState extends State<RegScreen> {
       ),
     );
   }
-}
-
-createaccountButton(
-    String fullname, String sid, String pass) async {
-  final response = await http.post(
-    Uri.parse('http://127.0.0.1:3000/userdata/login'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'fullname': fullname,
-      'sid': sid,
-      'pass': pass,
-    }),
-  );
 }
