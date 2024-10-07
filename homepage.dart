@@ -126,7 +126,6 @@ class _HomePageState extends State<HomePage> {
               ),
               height: double.infinity,
               width: double.infinity,
-
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Column(
@@ -141,7 +140,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(height: 5),
-
                     Text(
                       'Azraelu Morningstar',
                       style: TextStyle(
@@ -186,8 +184,8 @@ class _HomePageState extends State<HomePage> {
                 width: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Colors.white, width: 7), // White border
+                  border:
+                      Border.all(color: Colors.white, width: 7), // White border
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
@@ -233,7 +231,8 @@ class _ComputerPageState extends State<ComputerPage> {
   Future<void> _fetchComputerStatus() async {
     try {
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:3000/PC_List/view_all'),
+        Uri.parse(
+            'http://127.0.0.1:3000/PC_List/view_all'), // Adjust the endpoint as necessary
       );
 
       if (response.statusCode == 200) {
@@ -244,9 +243,13 @@ class _ComputerPageState extends State<ComputerPage> {
         setState(() {
           computerStatus = data.map((item) {
             return {
-              'pc': item['pc'],
-              'status': item['status'],
-              'color': item['status'] == 'Available' ? Colors.green : Color.fromARGB(255, 128, 0, 0),
+              'pc': item['PC_Name'],
+              'status': item['Status'],
+              'assignedUser':
+                  item['Assigned_User'] ?? 'None', // Handle null case
+              'color': item['Status'] == 'Available'
+                  ? Colors.green
+                  : Color.fromARGB(255, 128, 0, 0),
             };
           }).toList();
           _isLoading = false;
@@ -281,7 +284,7 @@ class _ComputerPageState extends State<ComputerPage> {
             child: const Padding(
               padding: EdgeInsets.only(top: 60.0, left: 22),
               child: Text(
-                'Available PC',
+                'Available PCs',
                 style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 40,
@@ -322,6 +325,7 @@ class _ComputerPageState extends State<ComputerPage> {
                               context,
                               computerStatus[index]['pc'],
                               computerStatus[index]['status'],
+                              computerStatus[index]['assignedUser'],
                               computerStatus[index]['color'],
                             ),
                             child: _buildComputerStatusCard(
@@ -339,7 +343,7 @@ class _ComputerPageState extends State<ComputerPage> {
       ),
     );
   }
-
+  
   // Widget to build each computer card
   Widget _buildComputerStatusCard(String pc, String status, Color statusColor) {
     return Container(
@@ -393,10 +397,12 @@ class _ComputerPageState extends State<ComputerPage> {
   }
 
   // Function to show a popup dialog when a PC is clicked
-  void _showComputerDialog(BuildContext context, String pc, String status, Color statusColor) {
+  void _showComputerDialog(BuildContext context, String pc, String status,
+      String assignedUser, Color statusColor) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by touching outside the dialog
+      barrierDismissible:
+          false, // Prevent dismissing by touching outside the dialog
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -416,7 +422,8 @@ class _ComputerPageState extends State<ComputerPage> {
                     size: 30,
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog when X is pressed
+                    Navigator.of(context)
+                        .pop(); // Close the dialog when X is pressed
                   },
                 ),
               ),
@@ -437,10 +444,15 @@ class _ComputerPageState extends State<ComputerPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    status,
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                  assignedUser == 'None'
+                      ? Text(
+                          status,
+                          style: const TextStyle(fontSize: 18),
+                        )
+                      : Text(
+                          assignedUser,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                   const SizedBox(width: 10),
                   Icon(
                     Icons.circle,
@@ -458,7 +470,8 @@ class _ComputerPageState extends State<ComputerPage> {
                 child: const Text('Request Session'),
                 style: ElevatedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromARGB(255, 128, 0, 0), // text color
+                  backgroundColor:
+                      const Color.fromARGB(255, 128, 0, 0), // text color
                 ),
               ),
             ],
@@ -469,58 +482,14 @@ class _ComputerPageState extends State<ComputerPage> {
   }
 }
 
+
+
 class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(colors: [
-                Color.fromARGB(255,128, 0, 0),
-                Color.fromARGB(255, 128, 0, 0),
-              ]),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 60.0, left: 22),
-              child: Text(
-                'History',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 40,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 150.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 255, 244, 241),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  topRight: Radius.circular(50),
-                ),
-              ),
-              height: double.infinity,
-              width: double.infinity,
-              child: const Padding(
-                 padding: EdgeInsets.all(8.0),
-                 child: Column(
-                  children: [
-                    Text('History'),
-                  ],
-                 ),
-              ),
-              
-            ),
-          ),
-        ],
+      body: Center(
+        child: Text("History Page"),
       ),
     );
   }
