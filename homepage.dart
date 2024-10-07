@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -213,41 +215,54 @@ class _HomePageState extends State<HomePage> {
 }
 
 // Other pages
-class ComputerPage extends StatelessWidget {
-  // Dummy data for computer statuses
-  final List<Map<String, dynamic>> computerStatus = [
-    {'pc': 'PC 1', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 2', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 3', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 4', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 5', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 6', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 7', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 8', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 9', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 10', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 11', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 12', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 13', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 14', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 15', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 16', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 17', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 18', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 19', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 20', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 21', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 22', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 23', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 24', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 25', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 26', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 27', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 28', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 29', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 30', 'status': 'Available', 'color': Colors.green},
-    // Add more PCs if needed
-  ];
+class ComputerPage extends StatefulWidget {
+  @override
+  _ComputerPageState createState() => _ComputerPageState();
+}
+
+class _ComputerPageState extends State<ComputerPage> {
+  List<Map<String, dynamic>> computerStatus = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchComputerStatus();
+  }
+
+  Future<void> _fetchComputerStatus() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:3000/PC_List/view_all'),
+      );
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, parse the JSON
+        List<dynamic> data = jsonDecode(response.body);
+
+        // Update the state with the fetched data
+        setState(() {
+          computerStatus = data.map((item) {
+            return {
+              'pc': item['pc'],
+              'status': item['status'],
+              'color': item['status'] == 'Available' ? Colors.green : Color.fromARGB(255, 128, 0, 0),
+            };
+          }).toList();
+          _isLoading = false;
+        });
+      } else {
+        // If the server did not return a 200 OK response, throw an exception
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      // Handle error case
+      print('Error fetching computer status: $e');
+      setState(() {
+        _isLoading = false; // Stop loading in case of error
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -288,33 +303,36 @@ class ComputerPage extends StatelessWidget {
               ),
               height: double.infinity,
               width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, // 3 PCs in each row
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: computerStatus.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => _showComputerDialog(
-                        context,
-                        computerStatus[index]['pc'],
-                        computerStatus[index]['status'],
-                        computerStatus[index]['color'],
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, // 3 PCs in each row
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          childAspectRatio: 1,
+                        ),
+                        itemCount: computerStatus.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () => _showComputerDialog(
+                              context,
+                              computerStatus[index]['pc'],
+                              computerStatus[index]['status'],
+                              computerStatus[index]['color'],
+                            ),
+                            child: _buildComputerStatusCard(
+                              computerStatus[index]['pc'],
+                              computerStatus[index]['status'],
+                              computerStatus[index]['color'],
+                            ),
+                          );
+                        },
                       ),
-                      child: _buildComputerStatusCard(
-                        computerStatus[index]['pc'],
-                        computerStatus[index]['status'],
-                        computerStatus[index]['color'],
-                      ),
-                    );
-                  },
-                ),
-              ),
+                    ),
             ),
           ),
         ],
@@ -439,7 +457,8 @@ class ComputerPage extends StatelessWidget {
                 },
                 child: const Text('Request Session'),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 128, 0, 0), // text color
+                  foregroundColor: Colors.white,
+                  backgroundColor: const Color.fromARGB(255, 128, 0, 0), // text color
                 ),
               ),
             ],
