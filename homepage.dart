@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -124,7 +126,6 @@ class _HomePageState extends State<HomePage> {
               ),
               height: double.infinity,
               width: double.infinity,
-
               child: const Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Column(
@@ -139,7 +140,6 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(height: 5),
-
                     Text(
                       'Azraelu Morningstar',
                       style: TextStyle(
@@ -184,8 +184,8 @@ class _HomePageState extends State<HomePage> {
                 width: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(
-                      color: Colors.white, width: 7), // White border
+                  border:
+                      Border.all(color: Colors.white, width: 7), // White border
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
@@ -213,41 +213,59 @@ class _HomePageState extends State<HomePage> {
 }
 
 // Other pages
-class ComputerPage extends StatelessWidget {
-  // Dummy data for computer statuses
-  final List<Map<String, dynamic>> computerStatus = [
-    {'pc': 'PC 1', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 2', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 3', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 4', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 5', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 6', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 7', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 8', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 9', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 10', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 11', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 12', 'status': 'Occupied', 'color': Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 13', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 14', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 15', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 16', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 17', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 18', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 19', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 20', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 21', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 22', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 23', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 24', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 25', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 26', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 27', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 28', 'status': 'Available', 'color': Colors.green},
-    {'pc': 'PC 29', 'status': 'Occupied', 'color': const Color.fromARGB(255, 128, 0, 0)},
-    {'pc': 'PC 30', 'status': 'Available', 'color': Colors.green},
-    // Add more PCs if needed
-  ];
+class ComputerPage extends StatefulWidget {
+  @override
+  _ComputerPageState createState() => _ComputerPageState();
+}
+
+class _ComputerPageState extends State<ComputerPage> {
+  List<Map<String, dynamic>> computerStatus = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchComputerStatus();
+  }
+
+  Future<void> _fetchComputerStatus() async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://127.0.0.1:3000/PC_List/view_all'), // Adjust the endpoint as necessary
+      );
+
+      if (response.statusCode == 200) {
+        // If the server returns a 200 OK response, parse the JSON
+        List<dynamic> data = jsonDecode(response.body);
+
+        // Update the state with the fetched data
+        setState(() {
+          computerStatus = data.map((item) {
+            return {
+              'pc': item['PC_Name'],
+              'status': item['Status'],
+              'assignedUser':
+                  item['Assigned_User'] ?? 'None', // Handle null case
+              'color': item['Status'] == 'Available'
+                  ? Colors.green
+                  : Color.fromARGB(255, 128, 0, 0),
+            };
+          }).toList();
+          _isLoading = false;
+        });
+      } else {
+        // If the server did not return a 200 OK response, throw an exception
+        throw Exception('Failed to load data');
+      }
+    } catch (e) {
+      // Handle error case
+      print('Error fetching computer status: $e');
+      setState(() {
+        _isLoading = false; // Stop loading in case of error
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -266,7 +284,7 @@ class ComputerPage extends StatelessWidget {
             child: const Padding(
               padding: EdgeInsets.only(top: 60.0, left: 22),
               child: Text(
-                'Available PC',
+                'Available PCs',
                 style: TextStyle(
                   fontFamily: 'Roboto',
                   fontSize: 40,
@@ -288,40 +306,44 @@ class ComputerPage extends StatelessWidget {
               ),
               height: double.infinity,
               width: double.infinity,
-              child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, // 3 PCs in each row
-                    mainAxisSpacing: 20,
-                    crossAxisSpacing: 20,
-                    childAspectRatio: 1,
-                  ),
-                  itemCount: computerStatus.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => _showComputerDialog(
-                        context,
-                        computerStatus[index]['pc'],
-                        computerStatus[index]['status'],
-                        computerStatus[index]['color'],
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3, // 3 PCs in each row
+                          mainAxisSpacing: 20,
+                          crossAxisSpacing: 20,
+                          childAspectRatio: 1,
+                        ),
+                        itemCount: computerStatus.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            onTap: () => _showComputerDialog(
+                              context,
+                              computerStatus[index]['pc'],
+                              computerStatus[index]['status'],
+                              computerStatus[index]['assignedUser'],
+                              computerStatus[index]['color'],
+                            ),
+                            child: _buildComputerStatusCard(
+                              computerStatus[index]['pc'],
+                              computerStatus[index]['status'],
+                              computerStatus[index]['color'],
+                            ),
+                          );
+                        },
                       ),
-                      child: _buildComputerStatusCard(
-                        computerStatus[index]['pc'],
-                        computerStatus[index]['status'],
-                        computerStatus[index]['color'],
-                      ),
-                    );
-                  },
-                ),
-              ),
+                    ),
             ),
           ),
         ],
       ),
     );
   }
-
+  
   // Widget to build each computer card
   Widget _buildComputerStatusCard(String pc, String status, Color statusColor) {
     return Container(
@@ -375,10 +397,12 @@ class ComputerPage extends StatelessWidget {
   }
 
   // Function to show a popup dialog when a PC is clicked
-  void _showComputerDialog(BuildContext context, String pc, String status, Color statusColor) {
+  void _showComputerDialog(BuildContext context, String pc, String status,
+      String assignedUser, Color statusColor) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent dismissing by touching outside the dialog
+      barrierDismissible:
+          false, // Prevent dismissing by touching outside the dialog
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
@@ -398,7 +422,8 @@ class ComputerPage extends StatelessWidget {
                     size: 30,
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop(); // Close the dialog when X is pressed
+                    Navigator.of(context)
+                        .pop(); // Close the dialog when X is pressed
                   },
                 ),
               ),
@@ -419,10 +444,15 @@ class ComputerPage extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    status,
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                  assignedUser == 'None'
+                      ? Text(
+                          status,
+                          style: const TextStyle(fontSize: 18),
+                        )
+                      : Text(
+                          assignedUser,
+                          style: const TextStyle(fontSize: 18),
+                        ),
                   const SizedBox(width: 10),
                   Icon(
                     Icons.circle,
@@ -439,7 +469,9 @@ class ComputerPage extends StatelessWidget {
                 },
                 child: const Text('Request Session'),
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white, backgroundColor: const Color.fromARGB(255, 128, 0, 0), // text color
+                  foregroundColor: Colors.white,
+                  backgroundColor:
+                      const Color.fromARGB(255, 128, 0, 0), // text color
                 ),
               ),
             ],
@@ -450,58 +482,14 @@ class ComputerPage extends StatelessWidget {
   }
 }
 
+
+
 class HistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(colors: [
-                Color.fromARGB(255,128, 0, 0),
-                Color.fromARGB(255, 128, 0, 0),
-              ]),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(top: 60.0, left: 22),
-              child: Text(
-                'History',
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontSize: 40,
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(top: 150.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 255, 244, 241),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50),
-                  topRight: Radius.circular(50),
-                ),
-              ),
-              height: double.infinity,
-              width: double.infinity,
-              child: const Padding(
-                 padding: EdgeInsets.all(8.0),
-                 child: Column(
-                  children: [
-                    Text('History'),
-                  ],
-                 ),
-              ),
-              
-            ),
-          ),
-        ],
+      body: Center(
+        child: Text("History Page"),
       ),
     );
   }
