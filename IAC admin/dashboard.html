@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="assets/css/sidebar-header.css">
+  <link rel="stylesheet" href="assets/css/page-content.css">
+</head>
+
+<style>
+  body {
+    background-color: rgb(232, 232, 232);
+  }
+
+  .shape {
+    display: inline-block;
+    background-color: white !important;
+    border-radius: 15px;
+    /* Rounded edges */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Shadow */
+  }
+
+  .shape.rectangle {
+    width: 680px;
+    height: 275px;
+    padding: 30px;
+    display: flex;
+    flex-direction: row;
+    /* Change to row so that items are placed horizontally */
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .square {
+    width: 332px;
+    height: 275px;
+  }
+
+  .square2 {
+    width: 680px;
+    height: 550px;
+  }
+
+  .first {
+    background-color: maroon !important;
+    /* Set first square color to maroon */
+  }
+
+  .info-panel {
+    padding: 15px;
+    background-color: #333;
+    /* Dark background for contrast */
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rectangle-icon {
+    width: 200px;
+    /* Adjust the size of the icon */
+    height: 200px;
+  }
+
+  .icon-img {
+    width: 100%;
+    /* Make the icon fill the div */
+    height: auto;
+    border-radius: 10%;
+    /* Optional: Make the icon circular */
+  }
+
+  .text-white {
+    text-align: left;
+    /* Align text to the left */
+  }
+
+  #username {
+    font-weight: bold;
+    font-size: 35px;
+    margin-bottom: 5px;
+    margin-left: 30px;
+  }
+
+  #manageComputersBtn {
+    margin-top: 5px;
+    background-color: maroon;
+    color: white;
+  }
+
+  .shape.square2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .shape.square2 h1 {
+    font-weight: bold;
+    color: maroon;
+  }
+
+  /* Adjust the canvas size */
+  #yearLevelChart {
+    max-width: 95%;
+    /* Increase width to make the graph larger */
+    height: 700px;
+    /* Increase height to make the graph taller */
+  }
+</style>
+
+<body>
+
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+      <!-- Sidebar -->
+      <div class="col-auto p-0 bg-dark" id="sidebar">
+        <div class="d-flex flex-column align-items-center align-items-sm-start text-white min-vh-100">
+          <div class="logo-container">
+            <img src="assets/images/logo.png" alt="Logo" class="logo">
+            <a href="dashboard.html"
+              class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none admin-title">
+              <span class="fs-5">Menu</span>
+            </a>
+          </div>
+          <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            <li>
+              <a href="dashboard.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-tachometer-alt icon-size"></i> <span class="ms-1">Dashboard</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="computers.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-desktop-alt icon-size"></i> <span class="ms-1">Computers</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="history.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-clock icon-size"></i> <span class="ms-1">History</span></h8>
+              </a>
+            </li>
+
+
+            <li>
+              <a href="#" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-certificate icon-size"></i> <span class="ms-1">None</span></h8>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- End Sidebar -->
+      <div class="col p-0">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
+          <div class="container-fluid">
+            <button type="button" id="sidebarCollapse" class="btn btn-info">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand" href="admin_profile.php">
+              <div class="header-right">
+                <a href="#">
+                  <i class="fas fa-user"></i>
+                  <span class="account-name">Username</span>
+                </a>
+                <i class="fas fa-chevron-down"></i>
+
+                <!-- Dropdown Menu -->
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item profile" href="admin_profile.php">Profile</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item logout" href="#" onclick="confirmLogout()">Log Out</a>
+                  </li>
+                </ul>
+              </div>
+            </a>
+          </div>
+        </nav>
+        <!-- End Header -->
+
+        <div class="container-fluid page-content mt-3">
+
+          <div class="d-flex align-items-center">
+            <!-- Rectangle with content inside -->
+            <div class="shape rectangle bg-primary me-3 d-flex align-items-center">
+              <!-- Icon or Image on the left -->
+              <div class="rectangle-icon me-3">
+                <img src="assets/images/lebron.jpg" alt="Icon" class="icon-img">
+              </div>
+              <div>
+                <h3>Welcome, <br><span id="username">Azraelu Morningstar</span></h3>
+                <p>November 8, 2024</p>
+                <button class="btn btn-light" id="manageComputersBtn"><i class="fas fa-desktop-alt icon-size"
+                    style="font-size: 1rem;"></i>Manage Computers</button>
+              </div>
+            </div>
+            <!-- Square 1 -->
+            <div class="shape square first bg-secondary me-3 p-3">
+              <div class="d-flex align-items-center">
+                <!-- Icon with increased size -->
+                <i class="fa fa-desktop me-2" style="font-size: 50px; color: white;"></i>
+                <span class="mt-4 mb-4" style="font-size: 35px; color: white; margin-left: 10px;">Available Computers
+                </span>
+              </div>
+              <a href="computers.html" class="d-flex justify-content-end" style="text-decoration: none; color: gray;">click here to continue</a>
+              <div class="d-flex justify-content-end" style="border-top: 3px solid #ffffff; margin-top: 5px;">
+                <!-- Number below the line -->
+                <span class="" style="color: #ffffff; font-size: 50px;">5</span> <!-- Replace 5 with dynamic value -->
+              </div>
+            </div>
+            <!-- Square 2 -->
+            <div class="shape square bg-secondary me-3 p-3">
+              <div class="d-flex align-items-center">
+                <!-- Icon with increased size -->
+                <i class="fa fa-clock me-2" style="font-size: 50px; color: maroon;"></i>
+                <span class="mt-4 mb-4" style="font-size: 35px; color: maroon; margin-left: 10px;">History Sessions
+                </span>
+              </div>
+              <a href="history.html" class="d-flex justify-content-end" style="text-decoration: none; color: gray;">click here to continue</a>
+              <div class="d-flex justify-content-end" style="border-top: 3px solid maroon; margin-top: 5px;">
+                <!-- Number below the line -->
+                <span class="" style="color: maroon; font-size: 50px;">5</span> <!-- Replace 5 with dynamic value -->
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center mt-4">
+            <!-- Year Level Usage Graph -->
+            <div class="shape square2 bg-secondary me-3 d-flex flex-column align-items-center">
+              <h1 class="text text-center mt-1">Year Level Usage Graph</h1>
+              <div class="">
+                <select class="form-select" id="yearLevelMonthDropdown" aria-label="Select Month">
+                  <option value="january">January</option>
+                  <option value="february">February</option>
+                  <option value="march">March</option>
+                  <option value="april">April</option>
+                  <option value="may">May</option>
+                  <option value="june">June</option>
+                  <option value="july">July</option>
+                  <option value="august">August</option>
+                  <option value="september">September</option>
+                  <option value="october">October</option>
+                  <option value="november">November</option>
+                  <option value="december">December</option>
+                </select>
+              </div>
+              <canvas id="yearLevelChart" class="my-3"></canvas>
+            </div>
+
+            <!-- Department Usage Graph -->
+            <div class="shape square2 bg-secondary">
+              <h1 class="text text-center mt-6">Department Usage Graph</h1>
+              <div class="">
+                <select class="form-select" id="yearLevelMonthDropdown" aria-label="Select Month">
+                  <option value="january">January</option>
+                  <option value="february">February</option>
+                  <option value="march">March</option>
+                  <option value="april">April</option>
+                  <option value="may">May</option>
+                  <option value="june">June</option>
+                  <option value="july">July</option>
+                  <option value="august">August</option>
+                  <option value="september">September</option>
+                  <option value="october">October</option>
+                  <option value="november">November</option>
+                  <option value="december">December</option>
+                </select>
+              </div>
+              <canvas id="departmentUsageChart" class="my-3" style="max-width: 60%; height: 100px;"></canvas>
+              <!-- Added canvas for department pie chart -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/header.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    function confirmLogout() {
+      var confirmation = confirm("Are you sure you want to log out?");
+      if (confirmation) {
+        // Make an AJAX call to logout
+        fetch('?ajax_logout=true')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Redirect to login page
+              window.location.href = '../login.php?logout_success=1';
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            // Fallback redirect
+            window.location.href = '../login.php';
+          });
+      }
+    }
+
+    // DOM ready handler
+    document.addEventListener('DOMContentLoaded', function () {
+      const headerRight = document.querySelector('.header-right');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+
+      headerRight.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default anchor behavior
+        dropdownMenu.classList.toggle('show');
+      });
+
+      // Close the dropdown when clicking outside
+      window.addEventListener('click', function (e) {
+        if (!headerRight.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+
+      // Handle dropdown links
+      const dropdownLinks = dropdownMenu.querySelectorAll('a');
+      dropdownLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.stopPropagation(); // Prevent event bubbling
+        });
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Existing code ...
+
+      // Bar graph for Year Level Usage
+      const ctx = document.getElementById('yearLevelChart').getContext('2d');
+      const yearLevelChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], // Customize with actual year levels
+          datasets: [{
+            label: 'Usage Count',
+            data: [30, 45, 25, 50], // Replace with actual data
+            backgroundColor: ['#800000', '#b53030', '#e77272', '#eea6a6'], // Colors for each bar
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: false // Hide legend if not needed
+            },
+            tooltip: {
+              enabled: true
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Year Level',
+                color: '#800000', // Maroon color for axis title
+                font: {
+                  weight: 'bold', // Bold title font
+                  size: 16
+                }
+              },
+              ticks: {
+                color: '#800000', // Maroon color for x-axis labels
+                font: {
+                  weight: 'bold', // Bold x-axis labels
+                  size: 14
+                }
+              },
+              grid: {
+                color: 'rgba(128, 0, 0, 0.2)', // Maroon-colored, semi-transparent grid lines
+                lineWidth: 1.5
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: 'Usage Count',
+                color: '#800000', // Maroon color for axis title
+                font: {
+                  weight: 'bold', // Bold title font
+                  size: 16
+                }
+              },
+              ticks: {
+                color: '#800000', // Maroon color for y-axis labels
+                font: {
+                  weight: 'bold', // Bold y-axis labels
+                  size: 14
+                },
+                stepSize: 10
+              },
+              grid: {
+                color: 'rgba(128, 0, 0, 0.2)', // Maroon-colored, semi-transparent grid lines
+                lineWidth: 1.5
+              },
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    });
+
+    // Department Usage Pie Chart
+    const deptCtx = document.getElementById('departmentUsageChart').getContext('2d');
+    const departmentUsageChart = new Chart(deptCtx, {
+      type: 'pie',
+      data: {
+        labels: ['CCS', 'CTELA', 'CNHAS', 'BSA', 'CITHM'], // Customize department names
+        datasets: [{
+          data: [40, 25, 20, 15, 10], // Replace with actual data
+          backgroundColor: ['#800000', '#b53030', '#e77272', '#eea6a6', '#e6c2c2'],
+        }]
+      },
+      options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: {
+            font: {
+              size: 14
+            }
+          }
+        },
+        tooltip: {
+          enabled: true
+        }
+      }
+    }
+  });
+
+  </script>
+
+</body>
+
+</html>
