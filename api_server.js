@@ -12,33 +12,40 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 const logger = (req, res, next) => {
-    
-    console.log(`${req.method} ${req.protocol}://${req.get("host")}${req.originalUrl} : ${moment().format()}`);
-    next();
-    
+
+  console.log(`${req.method} ${req.protocol}://${req.get("host")}${req.originalUrl} : ${moment().format()}`);
+  next();
+
 }
 
 app.use(logger);
 
+// const connection = mysql.createConnection({
+
+//   host: "byg2lehiaall3bovpkv6-mysql.services.clever-cloud.com",
+//   user: "uduuh17lwy9qe1fl",
+//   password: "UQddsqwfmrsd9vKyIN7u",
+//   database: "byg2lehiaall3bovpkv6"
+
+// });
+
 const connection = mysql.createConnection({
-
-    host: "byg2lehiaall3bovpkv6-mysql.services.clever-cloud.com",
-    user: "uduuh17lwy9qe1fl",
-    password: "UQddsqwfmrsd9vKyIN7u",
-    database: "byg2lehiaall3bovpkv6"
-
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'iac' //name of your local database
 });
 
 connection.connect((err) => {
 
-    if(err){
+  if (err) {
 
-        console.log(`Error connecting to the database: ${err}`);
-        return;
+    console.log(`Error connecting to the database: ${err}`);
+    return;
 
-    }
+  }
 
-    console.log(`Successfully connected to the MySQL Database`);
+  console.log(`Successfully connected to the MySQL Database`);
 
 });
 
@@ -46,205 +53,212 @@ connection.connect((err) => {
 // LOG IN
 app.post('/userdata/login', (req, res) => {
 
-    const { email, password } = req.body; 
+  const { sid, password } = req.body;
 
-    const query = `SELECT * FROM college_credentials WHERE Student_ID = ?`;
+  const query = `SELECT * FROM students WHERE Student_ID = ?`;
 
-    connection.query(query, [email], (err, rows) => {
+  connection.query(query, [sid], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(500).json({ error: err.message });
-        }
+      return res.status(500).json({ error: err.message });
+    }
 
-        if(rows.length > 0){
-            
-            const user = rows[0];
+    if (rows.length > 0) {
 
-            bcrypt.compare(password, user.Password, (err, result) => {
+      const user = rows[0];
 
-                if(err){
+      bcrypt.compare(password, user.password, (err, result) => {
 
-                    return res.status(500).json({ error: err.message });
+        if (err) {
 
-                }
-
-                if(result){
-
-                    res.status(200).json(user);
-
-                }else{
-
-                    res.status(401).json({ msg: `Invalid ID Number or Password` });
-
-                }
-
-            });
-
-        }else{
-
-            res.status(401).json({ msg: 'Invalid email or password' });
+          return res.status(500).json({ error: err.message });
 
         }
 
-    });
+        if (result) {
 
+          res.status(200).json(user);
+
+        } else {
+
+          res.status(401).json({ msg: `Invalid ID Number or Password` });
+
+        }
+
+      });
+
+    } else {
+
+      res.status(401).json({ msg: 'Invalid ID Number or Password' });
+
+    }
+  });
 });
 
 
 // REGISTER
 app.post(`/userdata/register`, (req, res) => {
 
-    const { sid, fullname, password } = req.body;
+  const { sid, firstname, lastname, yrlvl, course, password } = req.body;
 
-    bcrypt.hash(password, salt, (err, hashed) => {
+  bcrypt.hash(password, salt, (err, hashed) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(500).json({ error: err.message });
+      return res.status(500).json({ error: err.message });
 
-        }
+    }
 
-        const query = `INSERT INTO college_credentials (Student_ID, Full_Name, Password) VALUES (?, ?, ?)`;
+    const query = `INSERT INTO students (Student_ID, first_name, last_name, year_level, course, password) VALUES (?, ?, ?, ?, ?, ?)`;
 
-        connection.query(query, [sid, fullname, hashed], (err, result) => {
+    connection.query(query, [sid, firstname, lastname, yrlvl, course, hashed], (err, result) => {
 
-            if(err){
+      if (err) {
 
-                return res.status(500).json({ error: err.message });
+        return res.status(500).json({ error: err.message });
 
-            }   
+      }
 
-            res.status(201).json({ msg: `User successfully registered` });
-
-        });
-
-        console.log(`Student ID provided: ${sid}`);
-        console.log(`Full Name provided: ${fullname}`);
-        console.log(`Password provided: ${password}`);
-        console.log(`Password after hashed: ${hashed}`);
+      res.status(201).json({ msg: `User successfully registered` });
 
     });
 
+    console.log(`Student ID provided: ${sid}`);
+    console.log(`First Name provided: ${firstname}`);
+    console.log(`Last Name provided: ${lastname}`);
+    console.log(`Year Level provided: ${yrlvl}`);
+    console.log(`Course provided: ${course}`);
+    console.log(`Password provided: ${password}`);
+    console.log(`Password after hashed: ${hashed}`);
+
+  });
+
 });
+
+//GET ALL PC's
+app.get(`/PC_List/view_all`, (req, res) => {
+
+  const query = `SELECT * FROM pc_list`;
+  connection.query(query, (err, rows) => {
+
+    if (err) {
+
+      return res.status(400).json({ error: err.message });
+
+    }
+
+    res.status(200).json(rows);
+
+  });
+
+});
+
+
+
+
+// <============================================ OLD CODES (Recyclable) ============================================>
 
 
 // <================================== GET ALL ==================================>
 app.get(`/admin_credentials/view_all/`, (req, res) => {
 
-    const query = `SELECT * FROM admin_credentials`;
-    connection.query(query, (err, rows) => {
+  const query = `SELECT * FROM admin_credentials`;
+  connection.query(query, (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json(rows);
-        
-    });
+    res.status(200).json(rows);
+
+  });
 
 });
 
 app.get(`/admin_details/view_all/`, (req, res) => {
 
-    const query = `SELECT * FROM admin_details`;
-    connection.query(query, (err, rows) => {
+  const query = `SELECT * FROM admin_details`;
+  connection.query(query, (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json(rows);
+    res.status(200).json(rows);
 
-    });
+  });
 
 });
 
 app.get(`/college_credentials/view_all/`, (req, res) => {
 
-    const query = `SELECT * FROM college_credentials`;
-    connection.query(query, (err, rows) => {
+  const query = `SELECT * FROM college_credentials`;
+  connection.query(query, (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json(rows);
-    });
+    res.status(200).json(rows);
+  });
 
 });
 
 app.get(`/college_details/view_all`, (req, res) => {
 
-    const query = `SELECT * FROM college_details`;
-    connection.query(query, (err, rows) => {
+  const query = `SELECT * FROM college_details`;
+  connection.query(query, (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json(rows);
+    res.status(200).json(rows);
 
-    });
-
-});
-
-app.get(`/PC_List/view_all`, (req, res) => {
-
-    const query = `SELECT * FROM PC_List`;
-    connection.query(query, (err, rows) => {
-
-        if(err){
-
-            return res.status(400).json({ error: err.message });
-
-        }
-
-        res.status(200).json(rows);
-
-    });
+  });
 
 });
 
 app.get(`/shs_credentials/view_all`, (req, res) => {
 
-    const query = `SELECT * FROM shs_credentials`;
-    connection.query(query, (err, rows) => {
+  const query = `SELECT * FROM shs_credentials`;
+  connection.query(query, (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json(rows);
+    res.status(200).json(rows);
 
-    });
+  });
 
 });
 
 app.get(`/shs_details/view_all`, (req, res) => {
 
-    const query = `SELECT * FROM shs_details`;
-    connection.query(query, (err, rows) => {
+  const query = `SELECT * FROM shs_details`;
+  connection.query(query, (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json(rows);
+    res.status(200).json(rows);
 
-    });
+  });
 
 });
 
@@ -252,189 +266,207 @@ app.get(`/shs_details/view_all`, (req, res) => {
 // <================================== GET BY  ID ==================================>
 app.get(`/admin_credentials/view/:Employee_ID`, (req, res) => {
 
-    const { Employee_ID } = req.params;
-    const query = `SELECT * FROM admin_credentials WHERE Employee_ID = ?`;
+  const { Employee_ID } = req.params;
+  const query = `SELECT * FROM admin_credentials WHERE Employee_ID = ?`;
 
-    connection.query(query, [Employee_ID], (err, rows) => {
+  connection.query(query, [Employee_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${Employee_ID} not found!`})
+      res.status(404).json({ msg: `${Employee_ID} not found!` })
 
-        }   
+    }
 
-    });
+  });
 
 });
 
 app.get(`/admin_details/view/:Employee_ID`, (req, res) => {
 
-    const { Employee_ID } = req.params;
-    const query = `SELECT * FROM admin_details WHERE Employee_ID = ?`;
+  const { Employee_ID } = req.params;
+  const query = `SELECT * FROM admin_details WHERE Employee_ID = ?`;
 
-    connection.query(query, [Employee_ID], (err, rows) => {
+  connection.query(query, [Employee_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${Employee_ID} not found!` });
+      res.status(404).json({ msg: `${Employee_ID} not found!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.get(`/college_credentials/view/:Student_ID`, (req, res) => {
 
-    const { Student_ID } = req.params;
-    const query = `SELECT * FROM college_credentials WHERE Student_ID = ?`;
+  const { Student_ID } = req.params;
+  const query = `SELECT * FROM college_credentials WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${Student_ID} not found!` });
+      res.status(404).json({ msg: `${Student_ID} not found!` });
 
-        }
+    }
 
-    });
+  });
 
+});
+
+// GET USER BY ID
+app.get('/userdata/user/:Student_ID', (req, res) => {
+  const { Student_ID } = req.params;
+  const query = `SELECT * FROM college_credentials WHERE Student_ID = ?`;
+
+  connection.query(query, [Student_ID], (err, rows) => {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
+
+    if (rows.length > 0) {
+      res.status(200).json(rows[0]); // Return the user object
+    } else {
+      res.status(404).json({ msg: `${Student_ID} not found!` });
+    }
+  });
 });
 
 app.get(`/college_details/view/:Student_ID`, (req, res) => {
 
-    const { Student_ID } = req.params;
-    const query = `SELECT * FROM college_details WHERE Student_ID = ?`;
+  const { Student_ID } = req.params;
+  const query = `SELECT * FROM college_details WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${Student_ID} not found!` });
+      res.status(404).json({ msg: `${Student_ID} not found!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.get(`/PC_List/view/:PC_ID`, (req, res) => {
 
-    const { PC_ID } = req.params;
-    const query = `SELECT * FROM PC_List WHERE PC_ID = ?`;
+  const { PC_ID } = req.params;
+  const query = `SELECT * FROM PC_List WHERE PC_ID = ?`;
 
-    connection.query(query, [PC_ID], (err, rows) => {
+  connection.query(query, [PC_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${PC_ID} is not found!` });
+      res.status(404).json({ msg: `${PC_ID} is not found!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.get(`/shs_credentials/view/:Student_ID`, (req, res) => {
 
-    const { Student_ID } = req.params;
-    const query = `SELECT * FROM shs_credentials WHERE Student_ID = ?`;
+  const { Student_ID } = req.params;
+  const query = `SELECT * FROM shs_credentials WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${Student_ID} is not found!` });
-        }
+      res.status(404).json({ msg: `${Student_ID} is not found!` });
+    }
 
-    });
+  });
 
 });
 
 app.get(`/shs_details/view/:Student_ID`, (req, res) => {
 
-    const { Student_ID } = req.params;
-    const query = `SELECT * FROM shs_details WHERE Student_ID = ?`;
+  const { Student_ID } = req.params;
+  const query = `SELECT * FROM shs_details WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        if(rows.length > 0){
+    if (rows.length > 0) {
 
-            res.status(200).json(rows[0]);
+      res.status(200).json(rows[0]);
 
-        }else{
+    } else {
 
-            res.status(404).json({ msg: `${Student_ID} is not found!` });
+      res.status(404).json({ msg: `${Student_ID} is not found!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
@@ -442,134 +474,134 @@ app.get(`/shs_details/view/:Student_ID`, (req, res) => {
 // <================================== INSERT ==================================>
 app.post(`/admin_credentials/add`, (req, res) => {
 
-    const { Employee_ID, Username, Password } = req.body;
-    const query = `INSERT INTO admin_credentials (Employee_ID, Username, Password) VALUES (?, ?, ?)`;
+  const { Employee_ID, Username, Password } = req.body;
+  const query = `INSERT INTO admin_credentials (Employee_ID, Username, Password) VALUES (?, ?, ?)`;
 
-    connection.query(query, [Employee_ID, Username, Password], (err, rows) => {
+  connection.query(query, [Employee_ID, Username, Password], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message});
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
 app.post(`/admin_details/add`, (req, res) => {
 
-    const { Employee_ID, First_name, Last_name } = req.body;
-    const query = `INSERT INTO admin_details (Employee_ID, First_name, Last_name) VALUES (?, ?, ?)`;
+  const { Employee_ID, First_name, Last_name } = req.body;
+  const query = `INSERT INTO admin_details (Employee_ID, First_name, Last_name) VALUES (?, ?, ?)`;
 
-    connection.query(query, [Employee_ID, First_name, Last_name], (err, rows) => {
+  connection.query(query, [Employee_ID, First_name, Last_name], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
 app.post(`/college_credentials/add`, (req, res) => {
 
-    const { Student_ID, Password } = req.body;
-    const query = `INSERT INTO college_credentials (Student_ID, Password) VALUES (?, ?)`;
+  const { Student_ID, Password } = req.body;
+  const query = `INSERT INTO college_credentials (Student_ID, Password) VALUES (?, ?)`;
 
-    connection.query(query, [Student_ID, Password], (err, rows) => {
+  connection.query(query, [Student_ID, Password], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
 app.post(`/college_details/add`, (req, res) => {
 
-    const { Student_ID, First_name, Last_name, Year_Level, Course } = req.body;
-    const query = `INSERT INTO college_details (Student_ID, First_name, Last_name, Year_Level, Course) VALUES (?, ?, ?, ?, ?)`;
+  const { Student_ID, First_name, Last_name, Year_Level, Course } = req.body;
+  const query = `INSERT INTO college_details (Student_ID, First_name, Last_name, Year_Level, Course) VALUES (?, ?, ?, ?, ?)`;
 
-    connection.query(query, [Student_ID, First_name, Last_name, Year_Level, Course], (err, rows) => {
+  connection.query(query, [Student_ID, First_name, Last_name, Year_Level, Course], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
 app.post(`/PC_List/add`, (req, res) => {
 
-    const { PC_ID, Status } = req.body;
-    const query = `INSERT INTO PC_List (PC_ID, Status) VALUES (?, ?)`;
+  const { PC_ID, Status } = req.body;
+  const query = `INSERT INTO PC_List (PC_ID, Status) VALUES (?, ?)`;
 
-    connection.query(query, [PC_ID, Status], (err, rows) => {
+  connection.query(query, [PC_ID, Status], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
 app.post(`/shs_credentials/add`, (req, res) => {
 
-    const { Student_ID, Password } = req.body;
-    const query = `INSERT INTO shs_credentials (Student_ID, Password) VALUES (?, ?)`;
+  const { Student_ID, Password } = req.body;
+  const query = `INSERT INTO shs_credentials (Student_ID, Password) VALUES (?, ?)`;
 
-    connection.query(query, [Student_ID, Password], (err, rows) => {
+  connection.query(query, [Student_ID, Password], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
 app.post(`/shs_details/add`, (req, res) => {
 
-    const { Student_ID, First_name, Last_name, Year_Level, Strand } = req.body;
-    const query = `INSERT INTO shs_details (Student_ID, First_name, Last_name, Year_Level, Strand) VALUES (?, ?, ?, ?, ?)`;
+  const { Student_ID, First_name, Last_name, Year_Level, Strand } = req.body;
+  const query = `INSERT INTO shs_details (Student_ID, First_name, Last_name, Year_Level, Strand) VALUES (?, ?, ?, ?, ?)`;
 
-    connection.query(query, [ Student_ID, First_name, Last_name, Year_Level, Strand], (err, rows) => {
+  connection.query(query, [Student_ID, First_name, Last_name, Year_Level, Strand], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully added!`});
+    res.status(200).json({ msg: `Successfully added!` });
 
-    });
+  });
 
 });
 
@@ -577,147 +609,147 @@ app.post(`/shs_details/add`, (req, res) => {
 // <================================== UPDATE ==================================>
 app.put(`/admin_credentials/update`, (req, res) => {
 
-    const { Username, Password, Employee_ID } = req.body;
-    const query = `UPDATE admin_credentials SET Username = ?, Password = ? WHERE Employee_ID = ?`;
+  const { Username, Password, Employee_ID } = req.body;
+  const query = `UPDATE admin_credentials SET Username = ?, Password = ? WHERE Employee_ID = ?`;
 
-    connection.query(query, [Username, Password, Employee_ID], (err, rows) => {
+  connection.query(query, [Username, Password, Employee_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }else{
+    } else {
 
-            res.status(200).json({ msg: `Successfully updated` });
+      res.status(200).json({ msg: `Successfully updated` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.put(`/admin_details/update`, (req, res) => {
 
-    const { First_name, Last_name, Employee_ID } = req.body;
-    const query = `UPDATE admin_details SET First_name = ?, Last_name = ? WHERE Employee_ID = ?`;
-    
-    connection.query(query, [First_name, Last_name, Employee_ID], (err, rows) => {
+  const { First_name, Last_name, Employee_ID } = req.body;
+  const query = `UPDATE admin_details SET First_name = ?, Last_name = ? WHERE Employee_ID = ?`;
 
-        if(err){
+  connection.query(query, [First_name, Last_name, Employee_ID], (err, rows) => {
 
-            return res.status(400).json({ error: err.message });
+    if (err) {
 
-        }else{
-            
-            res.status(200).json({ msg: `Successfully Updated!` });
-        }
+      return res.status(400).json({ error: err.message });
 
-    });
+    } else {
+
+      res.status(200).json({ msg: `Successfully Updated!` });
+    }
+
+  });
 
 });
 
 app.put(`/college_credentials/update`, (req, res) => {
 
-    const { Password, Student_ID } = req.body;
-    const query = `UPDATE college_credentials SET Password = ? WHERE Student_ID = ?`;
+  const { Password, Student_ID } = req.body;
+  const query = `UPDATE college_credentials SET Password = ? WHERE Student_ID = ?`;
 
-    connection.query(query, [Password, Student_ID], (err, rows) => {
+  connection.query(query, [Password, Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }else{
+    } else {
 
-            res.status(200).json({ msg: `Successfully Updated!` });
+      res.status(200).json({ msg: `Successfully Updated!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.put(`/college_details/update`, (req, res) => {
 
-    const { First_name, Last_name, Year_Level, Course, Student_ID } = req.body;
-    const query = `UPDATE college_details SET First_name = ?, Last_name = ?, Year_Level = ?, Course = ? WHERE Student_ID = ?`;
+  const { First_name, Last_name, Year_Level, Course, Student_ID } = req.body;
+  const query = `UPDATE college_details SET First_name = ?, Last_name = ?, Year_Level = ?, Course = ? WHERE Student_ID = ?`;
 
-    connection.query(query, [First_name, Last_name, Year_Level, Course, Student_ID], (err, rows) => {
+  connection.query(query, [First_name, Last_name, Year_Level, Course, Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }else{
+    } else {
 
-            res.status(200).json({ msg: `Successfully Updated!` });
+      res.status(200).json({ msg: `Successfully Updated!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.put(`/PC_List/update`, (req, res) => {
 
-    const { Status, PC_ID } = req.body;
-    const query = `UPDATE PC_List SET Status = ? WHERE PC_ID = ?`;
+  const { Status, PC_ID } = req.body;
+  const query = `UPDATE PC_List SET Status = ? WHERE PC_ID = ?`;
 
-    connection.query(query, [Status, PC_ID], (err, rows) => {
+  connection.query(query, [Status, PC_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }else{
+    } else {
 
-            res.status(200).json({ msg: `Successfully Updated!` });
+      res.status(200).json({ msg: `Successfully Updated!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.put(`/shs_credentials/update`, (req, res) => {
 
-    const { Password, Student_ID } = req.body;
-    const query = `UPDATE shs_credentials SET Password = ? WHERE Student_ID = ?`;
+  const { Password, Student_ID } = req.body;
+  const query = `UPDATE shs_credentials SET Password = ? WHERE Student_ID = ?`;
 
-    connection.query(query, [Password, Student_ID], (err, rows) => {
+  connection.query(query, [Password, Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }else{
+    } else {
 
-            res.status(200).json({ msg: `Successfully Updated!` });
+      res.status(200).json({ msg: `Successfully Updated!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
 app.put(`/shs_details/update`, (req, res) => {
 
-    const { First_name, Last_name, Year_Level, Strand, Student_ID } = req.body;
-    const query = `UPDATE shs_details SET First_name = ?, Last_name = ?, Year_Level = ?, Strand = ? WHERE Student_ID = ?`;
+  const { First_name, Last_name, Year_Level, Strand, Student_ID } = req.body;
+  const query = `UPDATE shs_details SET First_name = ?, Last_name = ?, Year_Level = ?, Strand = ? WHERE Student_ID = ?`;
 
-    connection.query(query, [First_name, Last_name, Year_Level, Strand, Student_ID], (err, rows) => {
+  connection.query(query, [First_name, Last_name, Year_Level, Strand, Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }else{
+    } else {
 
-            res.status(200).json({ msg: `Successfully Updated!` });
+      res.status(200).json({ msg: `Successfully Updated!` });
 
-        }
+    }
 
-    });
+  });
 
 });
 
@@ -725,134 +757,134 @@ app.put(`/shs_details/update`, (req, res) => {
 // <================================== DELETE ==================================>
 app.delete(`/admin_credentials/delete`, (req, res) => {
 
-    const { Employee_ID } = req.body;
-    const query = `DELETE FROM admin_credentials WHERE Employee_ID = ?`;
+  const { Employee_ID } = req.body;
+  const query = `DELETE FROM admin_credentials WHERE Employee_ID = ?`;
 
-    connection.query(query, [Employee_ID], (err, rows) => {
+  connection.query(query, [Employee_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted` });
+    res.status(200).json({ msg: `Successfully Deleted` });
 
-    });
+  });
 
 });
 
 app.delete(`/admin_details/delete`, (req, res) => {
 
-    const { Employee_ID } = req.body;
-    const query = `DELETE FROM admin_details WHERE Employee_ID = ?`;
+  const { Employee_ID } = req.body;
+  const query = `DELETE FROM admin_details WHERE Employee_ID = ?`;
 
-    connection.query(query, [Employee_ID], (err, rows) => {
+  connection.query(query, [Employee_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted!` });
+    res.status(200).json({ msg: `Successfully Deleted!` });
 
-    });
+  });
 
 });
 
 app.delete(`/college_credentials/delete`, (req, res) => {
 
-    const { Student_ID } = req.body;
-    const query = `DELETE FROM college_credentials WHERE Student_ID = ?`;
+  const { Student_ID } = req.body;
+  const query = `DELETE FROM college_credentials WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted!` });
+    res.status(200).json({ msg: `Successfully Deleted!` });
 
-    });
+  });
 
 });
 
 app.delete(`/college_details/delete`, (req, res) => {
 
-    const { Student_ID } = req.body;
-    const query = `DELETE FROM college_details WHERE Student_ID = ?`;
+  const { Student_ID } = req.body;
+  const query = `DELETE FROM college_details WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted!` });
+    res.status(200).json({ msg: `Successfully Deleted!` });
 
-    });
+  });
 
 });
 
 app.delete(`/PC_List/delete`, (req, res) => {
 
-    const { PC_ID } = req.body;
-    const query = `DELETE FROM PC_List WHERE PC_ID = ?`;
+  const { PC_ID } = req.body;
+  const query = `DELETE FROM PC_List WHERE PC_ID = ?`;
 
-    connection.query(query, [PC_ID], (err, rows) => {
+  connection.query(query, [PC_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted!` });
+    res.status(200).json({ msg: `Successfully Deleted!` });
 
-    });
+  });
 
 });
 
 app.delete(`/shs_credentials/delete`, (req, res) => {
 
-    const { Student_ID } = req.body;
-    const query = `DELETE FROM shs_credentials WHERE Student_ID = ?`;
+  const { Student_ID } = req.body;
+  const query = `DELETE FROM shs_credentials WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted!` });
+    res.status(200).json({ msg: `Successfully Deleted!` });
 
-    });
+  });
 
 });
 
 app.delete(`/shs_details/delete`, (req, res) => {
 
-    const { Student_ID } = req.body;
-    const query = `DELETE FROM shs_details WHERE Student_ID = ?`;
+  const { Student_ID } = req.body;
+  const query = `DELETE FROM shs_details WHERE Student_ID = ?`;
 
-    connection.query(query, [Student_ID], (err, rows) => {
+  connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+    if (err) {
 
-            return res.status(400).json({ error: err.message });
+      return res.status(400).json({ error: err.message });
 
-        }
+    }
 
-        res.status(200).json({ msg: `Successfully Deleted!` });
+    res.status(200).json({ msg: `Successfully Deleted!` });
 
-    });
+  });
 
 });
 
@@ -860,6 +892,6 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(3000, () => {
 
-    console.log(`Server is running at PORT ${PORT}`);
+  console.log(`Server is running at PORT ${PORT}`);
 
 })
