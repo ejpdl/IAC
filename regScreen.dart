@@ -13,27 +13,57 @@ class RegScreen extends StatefulWidget {
 class _RegScreenState extends State<RegScreen> {
   bool _obscureText = true;
   bool _obscureTextConfirm = true;
-  final TextEditingController _fullnameController = TextEditingController();
-  final TextEditingController _sidController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _isLoading = false;
+
+  String? selectedYearLevel;
+  String? selectedCourse;
+
+  final TextEditingController _sidController = TextEditingController();
+  final TextEditingController _fnameController = TextEditingController();
+  final TextEditingController _lnameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  final List<String> yearLevels = [
+    '1st Year',
+    '2nd Year',
+    '3rd Year',
+    '4th Year',
+  ];
+
+  final List<String> courses = [
+    'BS In Computer Science',
+    'BS In Engineering',
+    'BS In Accountacy',
+    'BS In Business Administration',
+    'BS In Education',
+    'BS In Nursing',
+  ];
 
   // Function to handle registration logic
   Future<void> _register() async {
-    final String fullname = _fullnameController.text;
     final String sid = _sidController.text;
+    final String firstname = _fnameController.text;
+    final String lastname = _lnameController.text;
+    final String yrlvl = selectedYearLevel ?? '';
+    final String course = selectedCourse ?? '';
     final String password = _passwordController.text;
     final String confirmPassword = _confirmPasswordController.text;
 
     // Simple Validation
-    if (fullname.isEmpty || sid.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (sid.isEmpty ||
+        firstname.isEmpty ||
+        lastname.isEmpty ||
+        yrlvl.isEmpty ||
+        course.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
       return;
     }
-
     if (password != confirmPassword) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Passwords do not match')),
@@ -54,8 +84,11 @@ class _RegScreenState extends State<RegScreen> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode({
-          'fullname': fullname,
           'sid': sid,
+          'firstname': firstname,
+          'lastname': lastname,
+          'yrlvl': yrlvl,
+          'course': course,
           'password': password,
         }),
       );
@@ -67,7 +100,8 @@ class _RegScreenState extends State<RegScreen> {
         // Handle successful registration
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()), // Redirect to login
+          MaterialPageRoute(
+              builder: (context) => const LoginScreen()), // Redirect to login
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -76,7 +110,8 @@ class _RegScreenState extends State<RegScreen> {
       } else {
         // Show error message if registration fails
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration Failed: ${response.statusCode}')),
+          SnackBar(
+              content: Text('Registration Failed: ${response.statusCode}')),
         );
       }
     } catch (e) {
@@ -135,23 +170,6 @@ class _RegScreenState extends State<RegScreen> {
                     children: [
                       const SizedBox(height: 20),
                       TextField(
-                        controller: _fullnameController,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: const InputDecoration(
-                            suffixIcon: Icon(
-                              Icons.abc_outlined,
-                              color: Color.fromARGB(255, 226, 221, 221),
-                            ),
-                            label: Text(
-                              'Full Name',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            )),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
                         controller: _sidController,
                         style: const TextStyle(color: Colors.white),
                         decoration: const InputDecoration(
@@ -167,6 +185,132 @@ class _RegScreenState extends State<RegScreen> {
                             ),
                           ),
                           hintText: 'A**-****',
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _fnameController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                            suffixIcon: Icon(
+                              Icons.abc_outlined,
+                              color: Color.fromARGB(255, 226, 221, 221),
+                            ),
+                            label: Text(
+                              'First Name',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            )),
+                      ),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _lnameController,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: const InputDecoration(
+                            suffixIcon: Icon(
+                              Icons.abc_outlined,
+                              color: Color.fromARGB(255, 226, 221, 221),
+                            ),
+                            label: Text(
+                              'Last Name',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            )),
+                      ),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        value: selectedYearLevel,
+                        items: yearLevels.map((String level) {
+                          return DropdownMenuItem<String>(
+                            value: level,
+                            child: Text(
+                              level,
+                              style: TextStyle(
+                                // Menu items will be black
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedYearLevel = newValue;
+                            });
+                        },
+                        selectedItemBuilder: (BuildContext context) {
+                          return yearLevels.map((String value) {
+                            return Text(
+                              value,
+                              style: const TextStyle(
+                                color:
+                                    Colors.white, // Selected text will be white
+                              ),
+                            );
+                          }).toList();
+                        },
+                        decoration: const InputDecoration(
+                          label: Text(
+                            'Year Level',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        dropdownColor: Colors.white,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      DropdownButtonFormField<String>(
+                        value: selectedCourse,
+                        items: courses.map((String course) {
+                          return DropdownMenuItem<String>(
+                            value: course,
+                            child: Text(
+                              course,
+                              style: const TextStyle(
+                                // Menu items will be black
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedCourse = newValue;
+                          });
+                        },
+                        selectedItemBuilder: (BuildContext context) {
+                          return courses.map((String value) {
+                            return Text(
+                              value,
+                              style: const TextStyle(
+                                color:
+                                    Colors.white, // Selected text will be white
+                              ),
+                            );
+                          }).toList();
+                        },
+                        decoration: const InputDecoration(
+                          label: Text(
+                            'Course',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 255, 255, 255),
+                            ),
+                          ),
+                        ),
+                        dropdownColor: Colors.white,
+                        icon: const Icon(
+                          Icons.arrow_drop_down,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 20),

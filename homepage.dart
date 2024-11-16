@@ -243,13 +243,15 @@ class _ComputerPageState extends State<ComputerPage> {
         setState(() {
           computerStatus = data.map((item) {
             return {
-              'pc': item['PC_Name'],
-              'status': item['Status'],
+              'pc': item['PC_ID'],
+              'status': item['pc_status'],
               'assignedUser':
-                  item['Assigned_User'] ?? 'None', // Handle null case
-              'color': item['Status'] == 'Available'
+                  item['Student_ID'] ?? 'None', // Handle null case
+              'color': item['pc_status'] == 'Available'
                   ? Colors.green
-                  : Color.fromARGB(255, 128, 0, 0),
+                  : item['pc_status'] == 'Pending'
+                      ? Colors.orange
+                      : Color.fromARGB(255, 128, 0, 0),
             };
           }).toList();
           _isLoading = false;

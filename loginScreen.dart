@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:internet_access_control/homepage.dart';
 import 'package:internet_access_control/regScreen.dart';
 
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
@@ -15,93 +14,61 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _sidController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
   // Funtion to handle login logic
   Future<void> _login() async {
-
-    final String email = _emailController.text;
+    final String sid = _sidController.text;
     final String password = _passwordController.text;
 
-  // Simple Validation
-  if(email.isEmpty || password.isEmpty){
-
-    ScaffoldMessenger.of(context).showSnackBar(
-
-      const SnackBar(content: Text('Please fill in all fields')),
-
-    );
-
-    return;
-
-  }
-
-  setState((){
-
-    _isLoading = true;
-
-  });
-
-  try{
-
-    var url = "http://127.0.0.1:3000/userdata/login";
-
-    final response = await http.post(
-
-      Uri.parse(url),
-      headers: {
-
-        'Content-Type'  : 'application/json; charset=UTF-8'
-
-      },
-      body: jsonEncode({'email': email, 'password': password }),
-
-    );
-
-    if(response.statusCode == 200){
-
-      // Successful Login
-      final data = jsonDecode(response.body);
-
-      // Handle Login (if) success == true
-      Navigator.pushReplacement(
-        
-        context,
-        MaterialPageRoute(builder: (context) => const Homepage()),
-
-      );
-
-    }else{
-
-      // Show error message
+    // Simple Validation
+    if (sid.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-
-        SnackBar(content: Text('Login Failed: ${response.statusCode}')),
-
+        const SnackBar(content: Text('Please fill in all fields')),
       );
 
+      return;
     }
 
-  }catch (e){
-
-    ScaffoldMessenger.of(context).showSnackBar(
-
-      SnackBar(content: Text('Error: $e')),
-
-    );
-
-  }finally{
-
-    setState((){
-
-      _isLoading = false;
-
+    setState(() {
+      _isLoading = true;
     });
 
-  }
+    try {
+      var url = "http://127.0.0.1:3000/userdata/login";
 
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({'sid': sid, 'password': password}),
+      );
+
+      if (response.statusCode == 200) {
+        // Successful Login
+        final data = jsonDecode(response.body);
+
+        // Handle Login (if) success == true
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Homepage()),
+        );
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login Failed: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -150,12 +117,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     const SizedBox(height: 70), // Added for spacing at the top
                     TextField(
-                      controller: _emailController,  // Link controller
+                      controller: _sidController, // Link controller
                       style: TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         suffixIcon: Icon(Icons.check, color: Colors.grey),
                         label: Text(
-                          'Email',
+                          'Student Number',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
@@ -166,13 +133,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 20), // Added spacing between fields
                     // Password TextField
                     TextField(
-                      controller: _passwordController,  // Link controller
+                      controller: _passwordController, // Link controller
                       obscureText: _obscureText,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscureText ? Icons.visibility_off : Icons.visibility,
+                            _obscureText
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: Colors.grey,
                           ),
                           onPressed: () {
@@ -193,9 +162,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 50),
                     // Login button
                     _isLoading
-                        ? const CircularProgressIndicator()  // Show loading spinner
+                        ? const CircularProgressIndicator() // Show loading spinner
                         : InkWell(
-                            onTap: _login,  // Call login function on tap
+                            onTap: _login, // Call login function on tap
                             child: Container(
                               height: 45,
                               width: 300,
