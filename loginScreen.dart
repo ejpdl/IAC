@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:internet_access_control/homepage.dart';
 import 'package:internet_access_control/regScreen.dart';
 
@@ -8,7 +9,6 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoginScreenState createState() => _LoginScreenState();
 }
 
@@ -18,17 +18,14 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  // Funtion to handle login logic
   Future<void> _login() async {
     final String sid = _sidController.text;
     final String password = _passwordController.text;
 
-    // Simple Validation
     if (sid.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill in all fields')),
       );
-
       return;
     }
 
@@ -46,16 +43,16 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
-        // Successful Login
-        final data = jsonDecode(response.body);
+        // Save student ID to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('studentId', sid);
 
-        // Handle Login (if) success == true
+        // Navigate to homepage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Homepage()),
         );
       } else {
-        // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login Failed: ${response.statusCode}')),
         );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluid_bottom_nav_bar/fluid_bottom_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -78,14 +79,62 @@ class _HomepageState extends State<Homepage> {
 
 // HomePage with exact layout from the provided image
 class HomePage extends StatefulWidget {
-  final String userName = 'Azraelu Morningstar'; // Example username
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   File? _image;
+  String firstName = '';
+  String lastName = '';
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStudentData();
+  }
+
+  Future<void> _fetchStudentData() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final studentId = prefs.getString('studentId');
+
+      if (studentId == null) {
+        setState(() {
+          isLoading = false;
+          firstName = 'User';
+          lastName = '';
+        });
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:3000/userdata/student/$studentId'),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          firstName = data['first_name'] ?? '';
+          lastName = data['last_name'] ?? '';
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          firstName = 'User';
+          lastName = '';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        firstName = 'User';
+        lastName = '';
+      });
+    }
+  }
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -126,12 +175,12 @@ class _HomePageState extends State<HomePage> {
               ),
               height: double.infinity,
               width: double.infinity,
-              child: const Padding(
+              child: Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       'Welcome,',
                       style: TextStyle(
                         fontSize: 22,
@@ -140,18 +189,24 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(height: 5),
-                    Text(
-                      'Azraelu Morningstar',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(255, 128, 0, 0), // Maroon
-                      ),
-                    ),
-                    SizedBox(height: 15),
-                    Divider(thickness: 1, color: Colors.black26),
-                    SizedBox(height: 10),
-                    Text(
+                    isLoading
+                        ? const CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Color.fromARGB(255, 128, 0, 0),
+                            ),
+                          )
+                        : Text(
+                            '$firstName $lastName',
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 128, 0, 0),
+                            ),
+                          ),
+                    const SizedBox(height: 15),
+                    const Divider(thickness: 1, color: Colors.black26),
+                    const SizedBox(height: 10),
+                    const Text(
                       'About Internet Access Control',
                       style: TextStyle(
                         fontSize: 18,
@@ -159,8 +214,8 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 20),
-                    Text(
+                    const SizedBox(height: 20),
+                    const Text(
                       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, '
                       'vulputate eu pharetra nec, mattis ac neque.',
                       textAlign: TextAlign.center,
@@ -184,14 +239,13 @@ class _HomePageState extends State<HomePage> {
                 width: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border:
-                      Border.all(color: Colors.white, width: 7), // White border
+                  border: Border.all(color: Colors.white, width: 7),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
                       spreadRadius: 5,
                       blurRadius: 10,
-                      offset: const Offset(0, 5), // Shadow effect
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
@@ -199,7 +253,7 @@ class _HomePageState extends State<HomePage> {
                   child: _image != null
                       ? Image.file(_image!, fit: BoxFit.cover)
                       : Image.asset(
-                          'assets/profile_picture.png', // Default profile picture
+                          'assets/profile_picture.png',
                           fit: BoxFit.cover,
                         ),
                 ),
@@ -245,8 +299,7 @@ class _ComputerPageState extends State<ComputerPage> {
             return {
               'pc': item['PC_ID'],
               'status': item['pc_status'],
-              'assignedUser':
-                  item['Student_ID'] ?? 'None', // Handle null case
+              'assignedUser': item['Student_ID'] ?? 'None', // Handle null case
               'color': item['pc_status'] == 'Available'
                   ? Colors.green
                   : item['pc_status'] == 'Pending'
