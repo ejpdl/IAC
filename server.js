@@ -20,21 +20,21 @@ const logger = (req, res, next) => {
 
 app.use(logger);
 
-// const connection = mysql.createConnection({
-
-//   host: "byg2lehiaall3bovpkv6-mysql.services.clever-cloud.com",
-//   user: "uduuh17lwy9qe1fl",
-//   password: "UQddsqwfmrsd9vKyIN7u",
-//   database: "byg2lehiaall3bovpkv6"
-
-// });
-
 const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'iac' //name of your local database
+
+  host: "byg2lehiaall3bovpkv6-mysql.services.clever-cloud.com",
+  user: "uduuh17lwy9qe1fl",
+  password: "UQddsqwfmrsd9vKyIN7u",
+  database: "byg2lehiaall3bovpkv6"
+
 });
+
+// const connection = mysql.createConnection({
+//   host: 'localhost',
+//   user: 'root',
+//   password: '',
+//   database: 'iac' //name of your local database
+// });
 
 connection.connect((err) => {
 
@@ -154,7 +154,33 @@ app.get(`/PC_List/view_all`, (req, res) => {
 
 });
 
+//GET Logger's Name
+app.get('/userdata/student/:id', async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    console.log(`Fetching data for student ID: ${studentId}`); // Log the requested ID
 
+    const query = 'SELECT first_name, last_name FROM students WHERE Student_ID = ?';
+
+    connection.query(query, [studentId], (err, results) => {
+      if (err) {
+        console.error('Database error:', err); // Log database errors
+        return res.status(500).json({ error: 'Database error', details: err.message });
+      }
+
+      if (results.length === 0) {
+        console.log(`No student found with ID: ${studentId}`); // Log when student not found
+        return res.status(404).json({ error: 'Student not found' });
+      }
+
+      console.log(`Found student data:`, results[0]); // Log successful result
+      res.json(results[0]);
+    });
+  } catch (error) {
+    console.error('Server error:', error); // Log server errors
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+});
 
 
 // <============================================ OLD CODES (Recyclable) ============================================>

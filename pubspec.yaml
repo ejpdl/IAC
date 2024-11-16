@@ -7,11 +7,12 @@ environment:
   sdk: '>=3.1.5 <4.0.0'
 
 dependencies:
+  fluid_bottom_nav_bar: ^1.4.0
   flutter:
     sdk: flutter
-  fluid_bottom_nav_bar: ^1.4.0
-  image_picker: ^0.8.4+4
-  http: ^1.2.2
+  http: ^1.1.0
+  image_picker: ^1.0.8
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -20,11 +21,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  fonts: 
-    - family: Roboto
-      fonts:
-        - asset: fonts/Roboto-Bold.ttf
-    - family: NotoSerif
-      fonts: 
-        - asset: fonts/NotoSerif-SemiBoldItalic.ttf
