@@ -13,7 +13,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        fontFamily: ( 'inter'),
+        fontFamily: ('inter'),
         useMaterial3: true,
       ),
       home: WelcomeScreen(),
