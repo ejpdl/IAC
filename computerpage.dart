@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class ComputerPage extends StatefulWidget {
@@ -40,6 +41,8 @@ class _ComputerPageState extends State<ComputerPage> {
                   : item['pc_status'] == 'Pending'
                       ? Colors.orange
                       : Color.fromARGB(255, 128, 0, 0),
+              'studentId': item['Student_ID'] ?? '', 
+              'pcId': item['PC_ID'],
             };
           }).toList();
           _isLoading = false;
@@ -117,6 +120,10 @@ class _ComputerPageState extends State<ComputerPage> {
                               computerStatus[index]['status'],
                               computerStatus[index]['assignedUser'],
                               computerStatus[index]['color'],
+                              computerStatus[index]['studentId'],
+                              computerStatus[index]['pcId'],
+
+                              
                             ),
                             child: _buildComputerStatusCard(
                               computerStatus[index]['pc'],
@@ -188,7 +195,7 @@ class _ComputerPageState extends State<ComputerPage> {
 
   // Function to show a popup dialog when a PC is clicked
   void _showComputerDialog(BuildContext context, String pc, String status,
-      String assignedUser, Color statusColor) {
+      String assignedUser, Color statusColor, String studentId, String pcId) {
     showDialog(
       context: context,
       barrierDismissible:
@@ -254,8 +261,17 @@ class _ComputerPageState extends State<ComputerPage> {
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () {
-                  // Do something, e.g., request session
-                  Navigator.of(context).pop(); // Close the dialog
+                  if (assignedUser == 'None') {
+                  _requestSession(studentId, pcId); 
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('PC is already assigned to another user.'),
+                      backgroundColor: Colors.red, // Customize the color if needed
+                    ),
+                  );
+                }
+                Navigator.of(context).pop();  // Close the dialog
                 },
                 child: const Text('Request Session'),
                 style: ElevatedButton.styleFrom(
@@ -270,4 +286,40 @@ class _ComputerPageState extends State<ComputerPage> {
       },
     );
   }
+
+
+//! NEED TO FIX THE REQUEST SESSION, IT SHOULD ADD THE STUDENT ID OF THE USER REQUESTING THE SESSION
+  Future<void> _requestSession(String studentId, String pcId) async {
+
+    if (studentId == null || studentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Student ID is null or empty. Cannot request session.'),
+          backgroundColor: Colors.red, // Customize the color if needed
+          ),
+      );  // Exit the function if Student_ID is not valid
+  }
+
+  // Prepare the request data
+  final url = Uri.parse('http://127.0.0.1:3000/request_access');
+  final response = await http.put(
+    url,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'Student_ID': studentId,
+      'time_used': DateTime.now().toIso8601String(), // Example time used
+      'date_used': DateTime.now().toIso8601String(), // Example date used
+      'PC_ID': pcId,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('Request successfully sent.');
+    
+  } else {
+    print('Failed to send request: ${response.body}');
+  }
+}
 }

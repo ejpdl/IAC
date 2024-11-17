@@ -43,15 +43,26 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
         // Save student ID to SharedPreferences
+        if (responseBody['token'] != null) {
+        final token = responseBody['token'];
+
+        // Save token and student ID to SharedPreferences
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('studentId', sid);
+        await prefs.setString('authToken', token); // Save the token
+        await prefs.setString('studentId', sid);   // Save the student ID
 
         // Navigate to homepage
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const Homepage()),
         );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login failed: No token received.')),
+        );
+      }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login Failed: ${response.statusCode}')),
