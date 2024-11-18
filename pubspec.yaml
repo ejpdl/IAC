@@ -10,7 +10,7 @@ dependencies:
   fluid_bottom_nav_bar: ^1.4.0
   flutter:
     sdk: flutter
-  http: ^1.1.0
+  http: ^1.2.2
   image_picker: ^1.0.8
   shared_preferences: ^2.2.0
 
@@ -21,3 +21,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts: 
+    - family: Roboto
+      fonts:
+        - asset: fonts/Roboto-Bold.ttf
+    - family: NotoSerif
+      fonts: 
+        - asset: fonts/NotoSerif-SemiBoldItalic.ttf
