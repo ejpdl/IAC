@@ -168,7 +168,7 @@
               <div class="header-right">
                 <a href="#">
                   <i class="fas fa-user"></i>
-                  <span class="account-name">Username</span>
+                  <span class="account-name" id = "account-name">Username</span>
                 </a>
                 <i class="fas fa-chevron-down"></i>
 
@@ -194,13 +194,15 @@
             <div class="shape rectangle bg-primary me-3 d-flex align-items-center">
               <!-- Icon or Image on the left -->
               <div class="rectangle-icon me-3">
-                <img src="assets/images/lebron.jpg" alt="Icon" class="icon-img">
+                <img src="assets/images/lebron.jpg" id = "changeable-image" alt="Icon" class="icon-img">
               </div>
               <div>
-                <h3>Welcome, <br><span id="username">Azraelu Morningstar</span></h3>
-                <p>November 8, 2024</p>
+                <h3>Welcome, <br><span id="fullname">Name</span></h3>
+                <p id = "date">Date</p>
+                <a href = "computers.html">
                 <button class="btn btn-light" id="manageComputersBtn"><i class="fas fa-desktop-alt icon-size"
                     style="font-size: 1rem;"></i>Manage Computers</button>
+                  </a>
               </div>
             </div>
             <!-- Square 1 -->
@@ -287,7 +289,7 @@
 
 
 
-
+  <script src = "assets/js/fetchs/dashboard_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -302,13 +304,13 @@
           .then(data => {
             if (data.status === 'success') {
               // Redirect to login page
-              window.location.href = '../login.php?logout_success=1';
+              window.location.href = '../login.html?logout_success=1';
             }
           })
           .catch(error => {
             console.error('Logout error:', error);
             // Fallback redirect
-            window.location.href = '../login.php';
+            window.location.href = '../login.html';
           });
       }
     }
@@ -448,6 +450,8 @@
   });
 
   </script>
+
+  
 
 </body>
 
