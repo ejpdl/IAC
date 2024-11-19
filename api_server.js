@@ -38,7 +38,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "iac"
+    database: "internet_access_center"
 
 });
 
