@@ -411,3 +411,279 @@ app.listen(3000, () => {
     console.log(`Server is running at PORT ${PORT}`);
 
 })
+
+// Endpoint to request a PC
+app.get('/api/student/:studentId', (req, res) => {
+    const studentId = req.params.studentId;
+
+    const query = `
+    SELECT Student_ID, first_name, last_name, year_level, course 
+    FROM students 
+    WHERE Student_ID = ?
+  `;
+
+    connection.query(query, [studentId], (error, results) => {
+        if (error) {
+            console.error('Error fetching student:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        res.json(results[0]);
+    });
+});
+// Endpoint to request a PC
+app.post('/api/request-pc', (req, res) => {
+    const { studentId, pcId } = req.body;
+
+    // First check if student exists
+    connection.query('SELECT * FROM students WHERE Student_ID = ?', [studentId], (error, results) => {
+        if (error) {
+            console.error('Error checking student:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        // Check if student already has a pending request or is using a PC
+        const checkExistingQuery = `
+      SELECT * FROM pc_list 
+      WHERE Student_ID = ? 
+      AND (pc_status = 'Pending' OR pc_status = 'Occupied')
+    `;
+
+        connection.query(checkExistingQuery, [studentId], (error, results) => {
+            if (error) {
+                console.error('Error checking existing requests:', error);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+
+            if (results.length > 0) {
+                const status = results[0].pc_status;
+                if (status === 'Pending') {
+                    return res.status(400).json({
+                        error: `You already have a pending request for PC ${results[0].PC_ID}`
+                    });
+                } else {
+                    return res.status(400).json({
+                        error: `You are currently using PC ${results[0].PC_ID}`
+                    });
+                }
+            }
+
+            // Check if PC is available
+            connection.query('SELECT * FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
+                if (error) {
+                    console.error('Error checking PC:', error);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+
+                if (results.length === 0) {
+                    return res.status(404).json({ error: 'PC not found' });
+                }
+
+                if (results[0].pc_status !== 'Available') {
+                    return res.status(400).json({ error: 'PC is not available' });
+                }
+
+                // Update PC status to Pending
+                const currentDate = new Date().toISOString().slice(0, 10);
+                const updateQuery = `
+          UPDATE pc_list 
+          SET pc_status = 'Pending', 
+              Student_ID = ?, 
+              date_used = ?
+          WHERE PC_ID = ?
+        `;
+
+                connection.query(updateQuery, [studentId, currentDate, pcId], (error) => {
+                    if (error) {
+                        console.error('Error updating PC status:', error);
+                        return res.status(500).json({ error: 'Internal server error' });
+                    }
+
+                    res.json({ message: 'PC request submitted successfully' });
+                });
+            });
+        });
+    });
+});
+// Endpoint to get all PCs with their status
+app.get('/api/pc-status', (req, res) => {
+    const query = `
+    SELECT p.*, s.first_name, s.last_name 
+    FROM pc_list p 
+    LEFT JOIN students s ON p.Student_ID = s.Student_ID
+  `;
+
+    connection.query(query, (error, results) => {
+        if (error) {
+            console.error('Error fetching PC status:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.json(results);
+    });
+});
+// Endpoint to handle request response (accept/decline)
+app.post('/api/request-response', (req, res) => {
+    const { pcId, action } = req.body;
+
+    if (action !== 'accept' && action !== 'decline') {
+        return res.status(400).json({ error: 'Invalid action' });
+    }
+
+    // First, get the student ID for the PC request
+    connection.query('SELECT Student_ID FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
+        if (error) {
+            console.error('Error fetching PC details:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'PC not found' });
+        }
+
+        const studentId = results[0].Student_ID;
+
+        // If declining, no need to check other PCs
+        if (action === 'decline') {
+            updatePCStatus('Available', null, pcId, res);
+            return;
+        }
+
+        // If accepting, check if student is already using another PC
+        const checkOtherPCsQuery = `
+      SELECT PC_ID FROM pc_list 
+      WHERE Student_ID = ? 
+      AND PC_ID != ? 
+      AND pc_status = 'Occupied'
+    `;
+
+        connection.query(checkOtherPCsQuery, [studentId, pcId], (error, results) => {
+            if (error) {
+                console.error('Error checking other PCs:', error);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
+
+            if (results.length > 0) {
+                return res.status(400).json({
+                    error: `Student is already using PC ${results[0].PC_ID}`
+                });
+            }
+
+            // If all checks pass, update the PC status
+            const newStatus = 'Occupied';
+            const currentTime = new Date();
+            const endTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // 1 hour
+
+            const updateQuery = `
+        UPDATE pc_list 
+        SET pc_status = ?,
+            time_used = CURRENT_TIME(),
+            end_time = ?
+        WHERE PC_ID = ?
+      `;
+
+            connection.query(updateQuery, [newStatus, endTime, pcId], (error) => {
+                if (error) {
+                    console.error('Error updating request:', error);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+
+                res.json({ message: 'Request accepted successfully' });
+            });
+        });
+    });
+});
+
+// Helper function to update PC status
+function updatePCStatus(status, studentId, pcId, res) {
+    const updateQuery = `
+    UPDATE pc_list 
+    SET pc_status = ?,
+        Student_ID = ?,
+        time_used = NULL,
+        end_time = NULL
+    WHERE PC_ID = ?
+  `;
+
+    connection.query(updateQuery, [status, studentId, pcId], (error) => {
+        if (error) {
+            console.error('Error updating PC status:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.json({ message: `Request ${status === 'Available' ? 'declined' : 'processed'} successfully` });
+    });
+}
+
+app.get('/api/pc-time/:pcId', (req, res) => {
+    const { pcId } = req.params;
+
+    const query = 'SELECT end_time FROM pc_list WHERE PC_ID = ?';
+    connection.query(query, [pcId], (error, results) => {
+        if (error) {
+            console.error('Error fetching time:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        if (results.length > 0) {
+            const endTime = results[0].end_time;
+            if (endTime) {
+                const currentTime = new Date();
+                const remainingTime = new Date(endTime) - currentTime;
+                res.json({ isActive: remainingTime > 0, remainingTime });
+            } else {
+                res.json({ isActive: false });
+            }
+        } else {
+            res.status(404).json({ error: 'PC not found' });
+        }
+    });
+});
+
+app.get('/api/check-expired-sessions', (req, res) => {
+    const updateQuery = `
+    UPDATE pc_list 
+    SET pc_status = 'Available', 
+        Student_ID = NULL, 
+        time_used = NULL, 
+        end_time = NULL
+    WHERE pc_status = 'Occupied' AND end_time < NOW()
+  `;
+
+    connection.query(updateQuery, (error, result) => {
+        if (error) {
+            console.error('Error checking expired sessions:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        res.json({ updatedSessions: result.affectedRows });
+    });
+});
+
+app.post('/api/end-session', (req, res) => {
+    const { pcId } = req.body;
+
+    const updateQuery = `
+    UPDATE pc_list 
+    SET pc_status = 'Available', 
+        Student_ID = NULL, 
+        time_used = NULL, 
+        end_time = NULL 
+    WHERE PC_ID = ?`;
+
+    connection.query(updateQuery, [pcId], (error, result) => {
+        if (error) {
+            console.error('Error ending session:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        res.json({ message: 'Session ended successfully' });
+    });
+});
