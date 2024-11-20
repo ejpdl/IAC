@@ -36,7 +36,7 @@ class _ComputerPageState extends State<ComputerPage> {
       }
 
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:4000/PC_List/view_all'),
+        Uri.parse('http://127.0.0.1:3000/PC_List/view_all'),
       );
 
       if (response.statusCode == 200) {
@@ -59,7 +59,7 @@ class _ComputerPageState extends State<ComputerPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://127.0.0.1:4000/PC_List/view_all'), // Adjust the endpoint as necessary
+            'http://127.0.0.1:3000/PC_List/view_all'), // Adjust the endpoint as necessary
       );
 
       if (response.statusCode == 200) {
@@ -169,7 +169,7 @@ class _ComputerPageState extends State<ComputerPage> {
       }
 
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:4000/api/request-pc'),
+        Uri.parse('http://127.0.0.1:3000/api/request-pc'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -349,7 +349,7 @@ class _ComputerPageState extends State<ComputerPage> {
 
     if (initialRemainingTime == null) {
       final response =
-          await http.get(Uri.parse('http://127.0.0.1:4000/api/pc-time/$pc'));
+          await http.get(Uri.parse('http://127.0.0.1:3000/api/pc-time/$pc'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> pcData = jsonDecode(response.body);
         if (pcData['remainingTime'] != null) {
