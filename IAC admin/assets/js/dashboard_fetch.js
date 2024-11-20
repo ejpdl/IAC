@@ -79,3 +79,52 @@ async function loadData(){
 
 loadData();
 
+
+// FETCH ALL AVAILABLE PC
+async function AvailablePc(){
+
+    const token = localStorage.getItem('token');
+
+    if(!token){
+
+        console.log(`No token found. Please Log in again`);
+        return;
+
+    }
+
+    try{
+
+        const response = await fetch(`http://localhost:3000/view_all/pc`, {
+
+            method: 'GET',
+            headers: {
+
+                'Authorization' :  token,
+
+
+            }
+
+        });
+
+        if(!response.ok){
+
+            throw new Error(`Failed to fetch the available pc`);
+
+        }
+
+        const pcList = await response.json();
+
+        const availablePCs = pcList.filter(pc => pc.pc_status.toLowerCase() === 'available');
+
+        document.getElementById("availablePCCount").textContent = availablePCs.length;
+
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+AvailablePc();

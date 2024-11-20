@@ -79,6 +79,91 @@ async function loadData(){
 
 loadData();
 
+async function addComputers(){
+  
+    const token = localStorage.getItem('token');
+
+    if(!token){
+
+      alert(`No token found. Please log in again`);
+      return;
+
+    }
+
+    const newPc = { 
+
+      PC_ID: document.querySelector(`#computerName`).value
+
+    }
+
+    try{
+
+        const response = await fetch(`http://localhost:3000/add/pc`, {
+
+            method: 'POST',
+            headers: {
+
+                'Authorization' :   token,
+                'Content-Type'  :   'application/json'
+
+            },
+            body: JSON.stringify(newPc)
+        
+        });
+
+        if(response.ok){
+
+          document.getElementById("addComputerForm").reset();
+
+          const successAlert = document.getElementById("successAlert");
+          document.getElementById("successMessage").textContent = `${newPc.PC_ID} was added successfully!`;
+          successAlert.classList.remove("d-none");
+          
+          setTimeout(() => {
+            successAlert.classList.add("d-none");
+            location.reload();
+          }, 3000);
+        
+        }else{
+
+          const ErrorData = await response.json();
+          console.error(`Error`, ErrorData);
+
+          const errorAlert = document.getElementById("errorAlert");
+          document.getElementById("errorMessage").textContent = ErrorData.msg || `Failed to add computer.`;
+          errorAlert.classList.remove("d-none");
+
+          // Hide the alert after 3 seconds
+          setTimeout(() => {
+            errorAlert.classList.add("d-none");
+            location.reload();
+          }, 3000);
+
+          throw new Error(ErrorData.msg || `Failed to add computer`);
+
+        }
+
+    }catch(error){
+
+      console.log(error);
+      const errorAlert = document.getElementById("errorAlert");
+      document.getElementById("errorMessage").textContent = `PC Name is already exists`;
+      errorAlert.classList.remove("d-none");
+
+      setTimeout(() => {
+        errorAlert.classList.add("d-none");
+      }, 3000);
+
+    }
+
+}
+
+
+document.getElementById("addComputerForm").addEventListener("submit", (event) => {
+  event.preventDefault();
+ 
+});
+
 // DISPLAY COMPUTERS DYNAMICALLY
 const pcListContainer = document.getElementById("pc-list");
 
