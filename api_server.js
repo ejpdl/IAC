@@ -16,10 +16,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const logger = (req, res, next) => {
-    
+
     console.log(`${req.method} ${req.protocol}://${req.get("host")}${req.originalUrl} : ${moment().format()}`);
     next();
-    
+
 }
 
 app.use(logger);
@@ -39,12 +39,13 @@ const connection = mysql.createConnection({
     user: "root",
     password: "",
     database: "internet_access_center"
+    // database: "iac"
 
 });
 
 connection.connect((err) => {
 
-    if(err){
+    if (err) {
 
         console.log(`Error connecting to the database: ${err}`);
         return;
@@ -61,7 +62,7 @@ const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
-    if(!token){
+    if (!token) {
 
         return res.status(403).json({ msg: `Access Denied. No token Provided` });
 
@@ -69,7 +70,7 @@ const verifyToken = (req, res, next) => {
 
     jwt.verify(token, secret, (err, decoded) => {
 
-        if(err){
+        if (err) {
 
             return res.status(401).json({ msg: `Invalid Token` });
 
@@ -87,7 +88,7 @@ app.post("/userdata/login", (req, res) => {
 
     const { sid, password } = req.body;
 
-    if (!sid || !password){
+    if (!sid || !password) {
 
         return res.status(400).json({ msg: "Student ID and Password are required." });
 
@@ -97,13 +98,13 @@ app.post("/userdata/login", (req, res) => {
 
     connection.query(query, [sid], async (err, rows) => {
 
-        if(err){
+        if (err) {
 
             return res.status(500).json({ error: "Database error." });
 
         }
 
-        if(rows.length === 0){
+        if (rows.length === 0) {
 
             return res.status(401).json({ msg: "Student ID or Password is incorrect." });
 
@@ -111,26 +112,26 @@ app.post("/userdata/login", (req, res) => {
 
         const user = rows[0];
 
-        if (!user.password){
+        if (!user.password) {
 
             return res.status(500).json({ error: "Password is missing in the database." });
 
         }
 
-        try{
+        try {
 
             const isMatch = await bcrypt.compare(password, user.password);
 
-            if(!isMatch){
+            if (!isMatch) {
 
                 return res.status(401).json({ msg: "Student ID or Password is incorrect." });
 
             }
 
             const token = jwt.sign(
-                { sid: user.Student_ID }, 
-                secret,                  
-                { expiresIn: '1h' }     
+                { sid: user.Student_ID },
+                secret,
+                { expiresIn: '1h' }
             );
 
             return res.status(200).json({
@@ -138,7 +139,7 @@ app.post("/userdata/login", (req, res) => {
                 token: token,
             });
 
-        } catch(error){
+        } catch (error) {
 
             console.error("Error during password comparison:", error);
             return res.status(500).json({ msg: "Error during password comparison." });
@@ -158,7 +159,7 @@ app.post(`/userdata/register`, (req, res) => {
 
     bcrypt.hash(password, salt, (err, hashed) => {
 
-        if(err){
+        if (err) {
 
             return res.status(500).json({ error: err.message });
 
@@ -168,11 +169,11 @@ app.post(`/userdata/register`, (req, res) => {
 
         connection.query(query, [sid, firstname, lastname, yrlvl, course, hashed], (err, result) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
-            }   
+            }
 
             res.status(201).json({ msg: `User successfully registered` });
 
@@ -193,7 +194,7 @@ app.post(`/userdata/register`, (req, res) => {
 // VIEW ALL STUDENTS
 app.get(`/students/view_all`, async (req, res) => {
 
-    try{
+    try {
 
         const query = `SELECT * FROM students`;
 
@@ -210,7 +211,7 @@ app.get(`/students/view_all`, async (req, res) => {
         });
 
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -221,22 +222,22 @@ app.get(`/students/view_all`, async (req, res) => {
 // VIEW ALL STUDENTS WITH SPECIFIC ID
 app.get(`/userdata/student/:id`, async (req, res) => {
 
-    try{
+    try {
 
-        const studentId  = req.params.id;
+        const studentId = req.params.id;
         console.log(`Fetching data for student ID: ${studentId}`);
 
         const query = `SELECT first_name, last_name FROM students WHERE Student_ID = ?`;
 
         connection.query(query, [studentId], (err, results) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
-            if(results.length === 0){
+            if (results.length === 0) {
 
                 console.log(`No student found with ID: ${studentId}`);
                 res.status(404).json({ msg: `Student ID ${studentId} not found.` });
@@ -248,7 +249,7 @@ app.get(`/userdata/student/:id`, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -260,58 +261,58 @@ app.get(`/userdata/student/:id`, async (req, res) => {
 // VIEW ALL PC LISTS
 app.get(`/PC_List/view_all`, async (req, res) => {
 
-    try{
+    try {
 
         const query = `SELECT * FROM pc_list`;
         connection.query(query, (err, rows) => {
-  
-            if(err){
-        
+
+            if (err) {
+
                 return res.status(400).json({ error: err.message });
-        
+
             }
-        
+
             res.status(200).json(rows);
-    
+
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
     }
-  
+
 });
 
 
 // REQUEST ACCESS (STUDENT USER POV)
 app.put(`/request_access`, verifyToken, async (req, res) => {
 
-        try {
-            const { pcId } = req.body; 
-            const studentId = req.user.Student_ID; // Extract Student_ID from the decoded token
-    
-            if (!studentId) {
-                return res.status(400).json({ msg: 'Student ID is missing from the token' });
-            }
-    
-            const timeUsed = Date.now(); 
-            const dateUsed = moment().format('YYYY-MM-DD');
-    
-    
-            const query = `UPDATE pc_list SET pc_status = 'Pending', Student_ID = ?, time_used = ?, date_used = ? WHERE PC_ID = ?`;
-    
-            connection.query(query, [studentId, timeUsed, dateUsed, pcId], (err, rows) => {
-                if (err) {
-                    return res.status(500).json({ error: err.message });
-                }
-    
-                res.status(200).json({ msg: `Request successfully sent` });
-            });
-        } catch (error) {
-            console.log(error);
-            res.status(500).json({ msg: 'Internal Server Error' });
+    try {
+        const { pcId } = req.body;
+        const studentId = req.user.Student_ID; // Extract Student_ID from the decoded token
+
+        if (!studentId) {
+            return res.status(400).json({ msg: 'Student ID is missing from the token' });
         }
+
+        const timeUsed = Date.now();
+        const dateUsed = moment().format('YYYY-MM-DD');
+
+
+        const query = `UPDATE pc_list SET pc_status = 'Pending', Student_ID = ?, time_used = ?, date_used = ? WHERE PC_ID = ?`;
+
+        connection.query(query, [studentId, timeUsed, dateUsed, pcId], (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+
+            res.status(200).json({ msg: `Request successfully sent` });
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ msg: 'Internal Server Error' });
+    }
 
 });
 
@@ -319,8 +320,8 @@ app.put(`/request_access`, verifyToken, async (req, res) => {
 
 // ADD PC LISTS
 app.post(`/PC_List/add`, async (req, res) => {
-    
-    try{
+
+    try {
 
         const { PC_ID, pc_status, Student_ID, time_used, date_used } = req.body;
 
@@ -328,7 +329,7 @@ app.post(`/PC_List/add`, async (req, res) => {
 
         connection.query(query, [PC_ID, pc_status, Student_ID, time_used, date_used], (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
@@ -339,7 +340,7 @@ app.post(`/PC_List/add`, async (req, res) => {
         });
 
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -351,13 +352,13 @@ app.post(`/PC_List/add`, async (req, res) => {
 // VIEW HISTORY
 app.get(`/history/view_all`, async (req, res) => {
 
-    try{
+    try {
 
         const query = `SELECT * FROM session_history`;
 
         connection.query(query, (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
@@ -367,7 +368,7 @@ app.get(`/history/view_all`, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -378,7 +379,7 @@ app.get(`/history/view_all`, async (req, res) => {
 // ADD HISTORY
 app.post('/history/add', async (req, res) => {
 
-    try{
+    try {
 
         const { session_id, Student_ID, PC_ID, start_time, end_time } = req.body;
 
@@ -386,17 +387,17 @@ app.post('/history/add', async (req, res) => {
 
         connection.query(query, [session_id, Student_ID, PC_ID, start_time, end_time], (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
-            res.status(200).json({ msg: `History successfully added.` });   
+            res.status(200).json({ msg: `History successfully added.` });
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -411,6 +412,14 @@ app.listen(3000, () => {
     console.log(`Server is running at PORT ${PORT}`);
 
 })
+
+
+
+
+
+
+
+
 
 // Endpoint to request a PC
 app.get('/api/student/:studentId', (req, res) => {
@@ -435,6 +444,7 @@ app.get('/api/student/:studentId', (req, res) => {
         res.json(results[0]);
     });
 });
+
 // Endpoint to request a PC
 app.post('/api/request-pc', (req, res) => {
     const { studentId, pcId } = req.body;
@@ -513,115 +523,6 @@ app.post('/api/request-pc', (req, res) => {
         });
     });
 });
-// Endpoint to get all PCs with their status
-app.get('/api/pc-status', (req, res) => {
-    const query = `
-    SELECT p.*, s.first_name, s.last_name 
-    FROM pc_list p 
-    LEFT JOIN students s ON p.Student_ID = s.Student_ID
-  `;
-
-    connection.query(query, (error, results) => {
-        if (error) {
-            console.error('Error fetching PC status:', error);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
-        res.json(results);
-    });
-});
-// Endpoint to handle request response (accept/decline)
-app.post('/api/request-response', (req, res) => {
-    const { pcId, action } = req.body;
-
-    if (action !== 'accept' && action !== 'decline') {
-        return res.status(400).json({ error: 'Invalid action' });
-    }
-
-    // First, get the student ID for the PC request
-    connection.query('SELECT Student_ID FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
-        if (error) {
-            console.error('Error fetching PC details:', error);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ error: 'PC not found' });
-        }
-
-        const studentId = results[0].Student_ID;
-
-        // If declining, no need to check other PCs
-        if (action === 'decline') {
-            updatePCStatus('Available', null, pcId, res);
-            return;
-        }
-
-        // If accepting, check if student is already using another PC
-        const checkOtherPCsQuery = `
-      SELECT PC_ID FROM pc_list 
-      WHERE Student_ID = ? 
-      AND PC_ID != ? 
-      AND pc_status = 'Occupied'
-    `;
-
-        connection.query(checkOtherPCsQuery, [studentId, pcId], (error, results) => {
-            if (error) {
-                console.error('Error checking other PCs:', error);
-                return res.status(500).json({ error: 'Internal server error' });
-            }
-
-            if (results.length > 0) {
-                return res.status(400).json({
-                    error: `Student is already using PC ${results[0].PC_ID}`
-                });
-            }
-
-            // If all checks pass, update the PC status
-            const newStatus = 'Occupied';
-            const currentTime = new Date();
-            const endTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // 1 hour
-
-            const updateQuery = `
-        UPDATE pc_list 
-        SET pc_status = ?,
-            time_used = CURRENT_TIME(),
-            end_time = ?
-        WHERE PC_ID = ?
-      `;
-
-            connection.query(updateQuery, [newStatus, endTime, pcId], (error) => {
-                if (error) {
-                    console.error('Error updating request:', error);
-                    return res.status(500).json({ error: 'Internal server error' });
-                }
-
-                res.json({ message: 'Request accepted successfully' });
-            });
-        });
-    });
-});
-
-// Helper function to update PC status
-function updatePCStatus(status, studentId, pcId, res) {
-    const updateQuery = `
-    UPDATE pc_list 
-    SET pc_status = ?,
-        Student_ID = ?,
-        time_used = NULL,
-        end_time = NULL
-    WHERE PC_ID = ?
-  `;
-
-    connection.query(updateQuery, [status, studentId, pcId], (error) => {
-        if (error) {
-            console.error('Error updating PC status:', error);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
-        res.json({ message: `Request ${status === 'Available' ? 'declined' : 'processed'} successfully` });
-    });
-}
 
 app.get('/api/pc-time/:pcId', (req, res) => {
     const { pcId } = req.params;
@@ -648,42 +549,3 @@ app.get('/api/pc-time/:pcId', (req, res) => {
     });
 });
 
-app.get('/api/check-expired-sessions', (req, res) => {
-    const updateQuery = `
-    UPDATE pc_list 
-    SET pc_status = 'Available', 
-        Student_ID = NULL, 
-        time_used = NULL, 
-        end_time = NULL
-    WHERE pc_status = 'Occupied' AND end_time < NOW()
-  `;
-
-    connection.query(updateQuery, (error, result) => {
-        if (error) {
-            console.error('Error checking expired sessions:', error);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-
-        res.json({ updatedSessions: result.affectedRows });
-    });
-});
-
-app.post('/api/end-session', (req, res) => {
-    const { pcId } = req.body;
-
-    const updateQuery = `
-    UPDATE pc_list 
-    SET pc_status = 'Available', 
-        Student_ID = NULL, 
-        time_used = NULL, 
-        end_time = NULL 
-    WHERE PC_ID = ?`;
-
-    connection.query(updateQuery, [pcId], (error, result) => {
-        if (error) {
-            console.error('Error ending session:', error);
-            return res.status(500).json({ error: 'Internal server error' });
-        }
-        res.json({ message: 'Session ended successfully' });
-    });
-});
