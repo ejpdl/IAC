@@ -10,109 +10,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="assets/css/sidebar-header.css">
   <link rel="stylesheet" href="assets/css/page-content.css">
+  <link rel="stylesheet" href="assets/css/dashboard.css">
 </head>
 
 <style>
-  body {
-    background-color: rgb(232, 232, 232);
-  }
 
-  .shape {
-    display: inline-block;
-    background-color: white !important;
-    border-radius: 15px;
-    /* Rounded edges */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    /* Shadow */
-  }
-
-  .shape.rectangle {
-    width: 680px;
-    height: 275px;
-    padding: 30px;
-    display: flex;
-    flex-direction: row;
-    /* Change to row so that items are placed horizontally */
-    justify-content: flex-start;
-    align-items: center;
-  }
-
-  .square {
-    width: 332px;
-    height: 275px;
-  }
-
-  .square2 {
-    width: 680px;
-    height: 550px;
-  }
-
-  .first {
-    background-color: maroon !important;
-    /* Set first square color to maroon */
-  }
-
-  .info-panel {
-    padding: 15px;
-    background-color: #333;
-    /* Dark background for contrast */
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .rectangle-icon {
-    width: 200px;
-    /* Adjust the size of the icon */
-    height: 200px;
-  }
-
-  .icon-img {
-    width: 100%;
-    /* Make the icon fill the div */
-    height: auto;
-    border-radius: 10%;
-    /* Optional: Make the icon circular */
-  }
-
-  .text-white {
-    text-align: left;
-    /* Align text to the left */
-  }
-
-  #username {
-    font-weight: bold;
-    font-size: 35px;
-    margin-bottom: 5px;
-    margin-left: 30px;
-  }
-
-  #manageComputersBtn {
-    margin-top: 5px;
-    background-color: maroon;
-    color: white;
-  }
-
-  .shape.square2 {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .shape.square2 h1 {
-    font-weight: bold;
-    color: maroon;
-  }
-
-  /* Adjust the canvas size */
-  #yearLevelChart {
-    max-width: 95%;
-    /* Increase width to make the graph larger */
-    height: 700px;
-    /* Increase height to make the graph taller */
-  }
 </style>
 
 <body>
@@ -216,7 +118,8 @@
               <a href="computers.html" class="d-flex justify-content-end" style="text-decoration: none; color: gray;">click here to continue</a>
               <div class="d-flex justify-content-end" style="border-top: 3px solid #ffffff; margin-top: 5px;">
                 <!-- Number below the line -->
-                <span class="" id = "availablePCCount" style="color: #ffffff; font-size: 50px;">0</span> <!-- Replace 5 with dynamic value -->
+                <span class="" id="availablePCCount" style="color: #ffffff; font-size: 50px;">0</span>
+                <!-- Replace 5 with dynamic value -->
               </div>
             </div>
             <!-- Square 2 -->
@@ -289,7 +192,7 @@
 
 
 
-  <script src = "assets/js/fetchs/dashboard_fetch.js"></script>
+  <script src = "assets/js/dashboard_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

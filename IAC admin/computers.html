@@ -10,123 +10,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="assets/css/sidebar-header.css">
   <link rel="stylesheet" href="assets/css/page-content.css">
+  <link rel="stylesheet" href="assets/css/computers.css">
 </head>
 
 <style>
-  body {
-    background-color: rgb(232, 232, 232);
-  }
-
-  .shape {
-    display: inline-block;
-    background-color: white !important;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-
-  .shape.rectangle {
-    width: 680px;
-    height: 300px;
-    padding: 30px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-  }
-
-  .square {
-    width: 332px;
-    height: 300px;
-  }
-
-  .square2 {
-    width: 680px;
-    height: 500px;
-  }
-
-  .first {
-    background-color: maroon !important;
-  }
-
-  .info-panel {
-    padding: 15px;
-    background-color: #333;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .rectangle-icon {
-    width: 200px;
-    height: 200px;
-  }
-
-  .icon-img {
-    width: 100%;
-    height: auto;
-    border-radius: 10%;
-  }
-
-  .text-white {
-    text-align: left;
-  }
-
-  #username {
-    font-weight: bold;
-    font-size: 35px;
-    margin-bottom: 5px;
-    margin-left: 30px;
-  }
-
-  #manageComputersBtn {
-    margin-top: 5px;
-    background-color: maroon;
-    color: white;
-  }
-
-  .computer-card {
-    height: 250px !important;
-    /* Increased height */
-    transition: transform 0.2s;
-    text-align: center;
-  }
-
-  .computer-card:hover {
-    transform: translateY(-5px);
-  }
-
-  .computer-icon {
-    font-size: 100px;
-    margin-bottom: 10px;
-  }
-
-  .computer-status {
-    font-size: 14px;
-    font-weight: bold;
-  }
-
-  .computer-user {
-    font-size: 14px;
-  }
-
-  .computer-status.occupied {
-    color: #dc3545;
-  }
-
-  .computer-status.available {
-    color: #28a745;
-  }
-
-  .computer-status.requesting {
-    color: #d3dd14;
-  }
-
-  .computer-name {
-    font-size: 25px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
 </style>
 
 <body>
@@ -178,8 +65,8 @@
               <div class="header-right">
                 <a href="#">
                   <i class="fas fa-user"></i>
-                  
-                  <span class="account-name" id = "account-name">Username</span>
+
+                  <span class="account-name" id="account-name">Username</span>
                 </a>
                 <i class="fas fa-chevron-down"></i>
                 <!-- Dropdown Menu -->
@@ -210,8 +97,8 @@
                     </div>
                     <div class="col">
                       <h5 class="mb-1">Good Day,</h5>
-                      <h4 class="mb-2" id = "fullname">Name</h4>
-                      <p class="text-muted mb-0" id = "date">Date</p>
+                      <h4 class="mb-2" id="fullname">Name</h4>
+                      <p class="text-muted mb-0" id="date">Date</p>
                     </div>
                     <div class="col-auto">
                       <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#manageModal"
@@ -233,46 +120,38 @@
                 <span id="errorMessage">An error occurred while adding the computer.</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
-              
 
-              <!-- Computers Grid -->
-              <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="pc-list">
+              <!-- Computer List Display Grid -->
+              <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                <div data-bs-target="#computerDetailsModal">
+                </div>
               </div>
 
-
-
-
-
-
-
-                <!-- Add more computer cards as needed -->
-             
-
               <!-- Manage Modal -->
-<div class="modal fade" id="manageModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Manage Computers</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <!-- Input for adding a new computer name -->
-        <form id="addComputerForm">
-          <div class="mb-3">
-            <label for="computerName" class="form-label">Computer Name</label>
-            <input type="text" class="form-control form-control-lg" id="computerName" placeholder="Enter new computer name" name = "computerName" required>
-          </div>
-          <button type="submit" class="btn mt-3" style="background-color: #800000; color: white;" onclick = "addComputers()">Add Computer</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
+              <div class="modal fade" id="manageModal" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Manage Computers</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Input for adding a new computer name -->
+                      <form id="addComputerForm">
+                        <div class="mb-3">
+                          <label for="computerName" class="form-label">Computer Name</label>
+                          <input type="text" class="form-control form-control-lg" id="computerName" placeholder="Enter new computer name"
+                            name="computerName" required>
+                        </div>
+                        <button type="submit" class="btn mt-3" style="background-color: #800000; color: white;" onclick="addComputers()">Add
+                          Computer</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-
-
-
+              <!-- Computer Details Modal -->
               <div class="modal fade" id="computerDetailsModal" tabindex="-1"
                 aria-labelledby="computerDetailsModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
@@ -284,11 +163,11 @@
                     <div class="modal-body">
                       <div class="d-flex flex-column align-items-center">
                         <i class="fas fa-desktop computer-icon" style="color: #800000; font-size: 100px;"></i>
-                        <div class="computer-name">PC_1</div>
-                        <div class="computer-status occupied">Occupied</div>
-                        <div class="computer-user"><strong>User:</strong> A21-0083</div>
-                        <div class="remaining-time mt-3">Remaining Time: 23min</div>
-                        <button class="btn btn-danger mt-3" id="endSessionBtn">End Session</button>
+                        <div class="computer-name"></div>
+                        <div class="computer-status occupied"></div>
+                        <div class="computer-user"></div>
+                        <button class="btn btn-danger mt-3" id="endSessionBtn" data-pc-id="">End Session</button>
+
                       </div>
                     </div>
                   </div>
@@ -306,9 +185,9 @@
                     <div class="modal-body">
                       <div class="d-flex flex-column align-items-center">
                         <i class="fas fa-desktop computer-icon" style="color: #800000; font-size: 100px;"></i>
-                        <div class="computer-name">PC_3</div>
-                        <div class="computer-status requesting">Pending Request</div>
-                        <div class="computer-user"><strong>Requesting:</strong> A21-0083</div>
+                        <div class="computer-name"></div>
+                        <div class="computer-status requesting"></div>
+                        <div class="computer-user"></div>
 
                         <!-- Flex container for button alignment -->
                         <div class="d-flex justify-content-between gap-2 mt-3 w-100">
@@ -327,21 +206,21 @@
                 <div class="modal-dialog modal-dialog-centered">
                   <div class="modal-content">
                     <div class="modal-header">
-                      <h5 class="modal-title" id="availableComputerDetailsModalLabel">Available Computer Details</h5>
+                      <h5 class="modal-title" id="availableComputerDetailsModalLabel">Computer Details</h5>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                       <div class="d-flex flex-column align-items-center">
                         <i class="fas fa-desktop computer-icon" style="color: #800000; font-size: 100px;"></i>
-                        <div class="computer-name">PC_2</div>
-                        <div class="computer-status available">Available</div>
-                        <div class="computer-user"> <strong>User:</strong> none</div>
+                        <div class="computer-name"></div>
+                        <div class="computer-status available"></div>
+                        <div class="computer-user">/div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
+              <!-- End of Computer Details Modal -->
             </div>
           </div>
         </div>
@@ -349,7 +228,7 @@
     </div>
   </div>
 
-  <script src = "assets/js/fetchs/computers_fetch.js"></script>
+  <script src="assets/js/computers_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script>
@@ -400,10 +279,6 @@
     });
   </script>
 
-  <script>
-
-
-  </script>
 </body>
 
 </html>
