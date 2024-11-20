@@ -76,7 +76,7 @@ class _RegScreenState extends State<RegScreen> {
     });
 
     try {
-      var url = "http://127.0.0.1:3000/userdata/register";
+      var url = "http://127.0.0.1:4000/userdata/register";
 
       final response = await http.post(
         Uri.parse(url),
