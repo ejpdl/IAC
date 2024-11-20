@@ -295,7 +295,34 @@ app.get(`/view_all/pc`, verifyToken, async (req, res) => {
 });
 
 
+// ADD NEW PC
+app.post(`/add/pc`, verifyToken, async (req, res) => {
 
+    try{
+
+        const { PC_ID } = req.body;
+
+        const query = `INSERT INTO pc_list (pc_id) VALUES (?)`;
+
+        connection.query(query, [PC_ID], (err, rows) => {
+
+            if(err){
+
+                return res.status(400).json({ error: err.message });
+
+            }
+
+            res.status(201).json({ message: "PC added successfully" });
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
 
 
 
