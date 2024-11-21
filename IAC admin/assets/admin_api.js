@@ -522,7 +522,106 @@ app.post('/api/end-session', (req, res) => {
 });
 
 
+// VIEW SESSION HISTORY
+app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
+    try{
+
+        const query = `
+        SELECT 
+        session_history.PC_ID, 
+        session_history.Student_ID, 
+        CONCAT(students.first_name, ' ', students.last_name) AS full_name, 
+        session_history.start_time, 
+        session_history.end_time
+        FROM 
+            session_history
+        JOIN 
+            students
+        ON 
+        session_history.student_id = students.student_id;
+
+        `;
+
+        connection.query(query, (err, rows) => {
+
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            res.status(200).json(rows);
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
+
+
+// FETCH THE COURSE AND YEAR LEVEL
+app.get(`/admin/year-level-usage`, verifyToken, async (req, res) => {
+
+    try {
+        const query = `
+        SELECT 
+            students.year_level, 
+            COUNT(session_history.Student_ID) AS usage_count
+        FROM 
+            session_history
+        JOIN 
+            students
+        ON 
+            session_history.Student_ID = students.Student_ID
+        GROUP BY 
+            students.year_level;
+        `;
+
+        connection.query(query, (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.status(200).json(rows);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An internal server error occurred." });
+    }
+
+});
+
+app.get(`/admin/course-usage`, verifyToken, async (req, res) => {
+    try {
+        const query = `
+        SELECT 
+            students.course, 
+            COUNT(session_history.Student_ID) AS usage_count
+        FROM 
+            session_history
+        JOIN 
+            students
+        ON 
+            session_history.Student_ID = students.Student_ID
+        GROUP BY 
+            students.course;
+        `;
+
+        connection.query(query, (err, rows) => {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.status(200).json(rows);
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "An internal server error occurred." });
+    }
+});
 
 
 
