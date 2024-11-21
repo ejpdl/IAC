@@ -36,12 +36,12 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
 
-    if(err){
+    if (err) {
 
         console.log(`Error connecting to the database: ${err}`);
         return;
 
-    }else{
+    } else {
 
         console.log(`Successfully connected to the database: ${connection.config.database}`);
 
@@ -52,11 +52,11 @@ connection.connect((err) => {
 // FOR AUTHENTICATION AND AUTHORIZATION
 const verifyToken = async (req, res, next) => {
 
-    try{
+    try {
 
         const token = await req.headers['authorization'];
 
-        if(!token){
+        if (!token) {
 
             return res.status(403).json({ message: "No token provided" });
 
@@ -64,7 +64,7 @@ const verifyToken = async (req, res, next) => {
 
         jwt.verify(token, secret, async (err, decoded) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(401).json({ message: "Invalid token" });
 
@@ -75,7 +75,7 @@ const verifyToken = async (req, res, next) => {
 
         })
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -86,27 +86,27 @@ const verifyToken = async (req, res, next) => {
 // REGISTER ADMIN
 app.post(`/register/admin`, async (req, res) => {
 
-    try{
+    try {
 
         const { username, password, first_name, last_name } = req.body;
 
-        if(!username || !password || !first_name || !last_name){
+        if (!username || !password || !first_name || !last_name) {
 
             return res.status(400).json({ message: "All fields are required" });
 
         }
 
         const check_existing_username = `SELECT * FROM admin WHERE username = ?`;
-        
+
         connection.query(check_existing_username, [username], (err, result) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
-            if(result.length > 0){
+            if (result.length > 0) {
 
                 return res.status(400).json({ message: `Username already exists` });
 
@@ -114,7 +114,7 @@ app.post(`/register/admin`, async (req, res) => {
 
             bcrypt.hash(password, salt, (err, hashed) => {
 
-                if(err){
+                if (err) {
 
                     return res.status(500).json({ message: "Error hashing password" });
 
@@ -124,7 +124,7 @@ app.post(`/register/admin`, async (req, res) => {
 
                 connection.query(query, [username, hashed, first_name, last_name], (err, result) => {
 
-                    if(err){
+                    if (err) {
 
                         return res.status(500).json({ error: err.message });
 
@@ -133,7 +133,7 @@ app.post(`/register/admin`, async (req, res) => {
                     res.status(201).json({
 
                         message: "Admin registered successfully",
-                        
+
                     });
 
                 });
@@ -142,7 +142,7 @@ app.post(`/register/admin`, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -153,11 +153,11 @@ app.post(`/register/admin`, async (req, res) => {
 // LOG IN ADMIN 
 app.post(`/login/admin`, async (req, res) => {
 
-    try{
+    try {
 
         const { username, password } = req.body;
 
-        if(!username || !password){
+        if (!username || !password) {
 
             return res.status(400).json({ message: "All fields are required" });
 
@@ -167,13 +167,13 @@ app.post(`/login/admin`, async (req, res) => {
 
         connection.query(query, [username, password], async (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
-            if(rows.length === 0){
+            if (rows.length === 0) {
 
                 return res.status(401).json({ msg: `Username or Password is incorrect` });
 
@@ -181,17 +181,17 @@ app.post(`/login/admin`, async (req, res) => {
 
             const user = rows[0];
 
-            if(!user.password){
+            if (!user.password) {
 
                 return res.status(500).json({ message: "Password not found" });
 
             }
 
-            try{
+            try {
 
                 const isMatch = await bcrypt.compare(password, user.password);
 
-                if(!isMatch){
+                if (!isMatch) {
 
                     return res.status(401).json({ msg: `Username or Password is incorrect` });
 
@@ -213,7 +213,7 @@ app.post(`/login/admin`, async (req, res) => {
 
                 });
 
-            }catch(error){
+            } catch (error) {
 
                 console.log(error);
 
@@ -221,7 +221,7 @@ app.post(`/login/admin`, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -233,7 +233,7 @@ app.post(`/login/admin`, async (req, res) => {
 // VIEW INFORMATION OF ADMIN
 app.get(`/admin/details`, verifyToken, async (req, res) => {
 
-    try{
+    try {
 
         const { username } = req.user;
 
@@ -241,17 +241,17 @@ app.get(`/admin/details`, verifyToken, async (req, res) => {
 
         connection.query(query, [username], (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
-            if(rows.length > 0){
+            if (rows.length > 0) {
 
                 res.status(200).json(rows[0]);
 
-            }else{
+            } else {
 
                 return res.status(500).json({ message: `Username ${username} not found` });
 
@@ -259,7 +259,7 @@ app.get(`/admin/details`, verifyToken, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -271,13 +271,13 @@ app.get(`/admin/details`, verifyToken, async (req, res) => {
 // VIEW ALL PC
 app.get(`/view_all/pc`, verifyToken, async (req, res) => {
 
-    try{
+    try {
 
         const query = `SELECT * FROM pc_list`;
 
         connection.query(query, (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(400).json({ error: err.message });
 
@@ -287,7 +287,7 @@ app.get(`/view_all/pc`, verifyToken, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -310,6 +310,27 @@ app.post(`/add/pc`, verifyToken, async (req, res) => {
     } catch (error) {
         console.log(error);
     }
+});
+
+
+// DELETE PC
+app.post('/delete/pc', verifyToken, (req, res) => {
+    const { PC_ID } = req.body;
+    // Query to delete the computer based on the PC_ID
+    const query = 'DELETE FROM pc_list WHERE PC_ID = ?';
+
+    connection.query(query, [PC_ID], (err, result) => {
+        if (err) {
+            console.error('Database error:', err);
+            return res.status(500).json({ msg: 'Failed to delete computer' });
+        }
+
+        if (result.affectedRows > 0) {
+            return res.status(200).json({ msg: `${PC_ID} was deleted successfully!` });
+        } else {
+            return res.status(404).json({ msg: `PC with ID ${PC_ID} not found.` });
+        }
+    });
 });
 
 
