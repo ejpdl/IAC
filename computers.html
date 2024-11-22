@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Computers</title>
+  <link rel = "icon" href = "assets/images/logo.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="assets/css/sidebar-header.css">
+  <link rel="stylesheet" href="assets/css/page-content.css">
+  <link rel="stylesheet" href="assets/css/computers.css">
+</head>
+
+<style>
+</style>
+
+<body>
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+      <!-- Sidebar -->
+      <div class="col-auto p-0 bg-dark" id="sidebar">
+        <div class="d-flex flex-column align-items-center align-items-sm-start text-white min-vh-100">
+          <div class="logo-container">
+            <img src="assets/images/logo.png" alt="Logo" class="logo">
+            <a href="dashboard.html"
+              class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none admin-title">
+              <span class="fs-5">Menu</span>
+            </a>
+          </div>
+          <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            <li>
+              <a href="dashboard.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-tachometer-alt icon-size"></i> <span class="ms-1">Dashboard</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="computers.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-desktop-alt icon-size"></i> <span class="ms-1">Computers</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="history.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-clock icon-size"></i> <span class="ms-1">History</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="#" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-certificate icon-size"></i> <span class="ms-1">None</span></h8>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- End Sidebar -->
+      <div class="col p-0">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
+          <div class="container-fluid">
+            <button type="button" id="sidebarCollapse" class="btn btn-info">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="admin_profile.php">
+              <div class="header-right">
+                <a href="#">
+                  <i class="fas fa-user"></i>
+
+                  <span class="account-name" id="account-name">Username</span>
+                </a>
+                <i class="fas fa-chevron-down"></i>
+                <!-- Dropdown Menu -->
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item profile" href="admin_profile.php">Profile</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item logout" href="#" onclick="confirmLogout()">Log Out</a>
+                  </li>
+                </ul>
+              </div>
+            </a>
+          </div>
+        </nav>
+        <!-- End Header -->
+
+        <div class="container-fluid page-content mt-3">
+          <div class="row flex-nowrap">
+            <div class="container-fluid py-4">
+              <!-- Profile Dashboard Section -->
+              <div class="card mb-4 bg-light">
+                <div class="card-body">
+                  <div class="row align-items-center">
+                    <div class="col-auto">
+                      <img src="assets/images/lebron.jpg" alt="Profile Image" class="rounded-circle"
+                        style="width: 80px; height: 80px; object-fit: cover;">
+                    </div>
+                    <div class="col">
+                      <h5 class="mb-1">Good Day,</h5>
+                      <h4 class="mb-2" id="fullname">Name</h4>
+                      <p class="text-muted mb-0" id="date">Date</p>
+                    </div>
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#manageModal"
+                        style="background-color: #800000 !important;">
+                        <i class="fas fa-cog me-2"></i>Manage Computers
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Success/Error Messages Placeholder -->
+              <div id="successAlert" class="alert alert-success alert-dismissible fade show d-none" role="alert">
+                <span id="successMessage">Computer added successfully!</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+              
+              <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
+                <span id="errorMessage">An error occurred while adding the computer.</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+
+              <!-- Computer List Display Grid -->
+              <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+                <div data-bs-target="#computerDetailsModal">
+                </div>
+              </div>
+
+              <!-- Manage Modal -->
+              <div class="modal fade" id="manageModal" tabindex="-1">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Manage Computers</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                      <!-- Input for adding a new computer name -->
+                      <form id="ComputerForm">
+                        <div class="mb-3">
+                          <label for="computerName" class="form-label">Computer Name</label>
+                          <input type="text" class="form-control form-control-lg" id="computerName" placeholder="Enter new computer name"
+                            name="computerName" required>
+                        </div>
+                        <button type="submit" class="btn mt-3" style="background-color: #800000; color: white;" onclick="addComputers()">Add
+                          Computer</button>
+                          <button type="delete" class="btn mt-3" style="background-color: #800000; color: white;" onclick="deleteComputers()">Delete
+                            Computer</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Computer Details Modal -->
+              <div class="modal fade" id="computerDetailsModal" tabindex="-1"
+                aria-labelledby="computerDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="computerDetailsModalLabel">Computer Details</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="fas fa-desktop computer-icon" style="color: #800000; font-size: 100px;"></i>
+                        <div class="computer-name"></div>
+                        <div class="computer-status occupied"></div>
+                        <div class="computer-user"></div>
+                        <button class="btn btn-danger mt-3" id="endSessionBtn" data-pc-id="">End Session</button>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" id="reqComputerDetailsModal" tabindex="-1"
+                aria-labelledby="reqComputerDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="reqComputerDetailsModalLabel">Computer Details</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="fas fa-desktop computer-icon" style="color: #800000; font-size: 100px;"></i>
+                        <div class="computer-name"></div>
+                        <div class="computer-status requesting"></div>
+                        <div class="computer-user"></div>
+
+                        <!-- Flex container for button alignment -->
+                        <div class="d-flex justify-content-between gap-2 mt-3 w-100">
+                          <button class="btn btn-success w-50">Accept</button>
+                          <button class="btn btn-info w-50">Decline</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="modal fade" id="availableComputerDetailsModal" tabindex="-1"
+                aria-labelledby="availableComputerDetailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="availableComputerDetailsModalLabel">Computer Details</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <div class="d-flex flex-column align-items-center">
+                        <i class="fas fa-desktop computer-icon" style="color: #800000; font-size: 100px;"></i>
+                        <div class="computer-name"></div>
+                        <div class="computer-status available"></div>
+                        <div class="computer-user">/div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- End of Computer Details Modal -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/computers_fetch.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/header.js"></script>
+  <script>
+    function confirmLogout() {
+      var confirmation = confirm("Are you sure you want to log out?");
+      if (confirmation) {
+        // Make an AJAX call to logout
+        fetch('?ajax_logout=true')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Redirect to login page
+              window.location.href = '../login.html?logout_success=1';
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            // Fallback redirect
+            window.location.href = '../login.html';
+          });
+      }
+    }
+
+    // DOM ready handler
+    document.addEventListener('DOMContentLoaded', function () {
+      const headerRight = document.querySelector('.header-right');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+
+      headerRight.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default anchor behavior
+        dropdownMenu.classList.toggle('show');
+      });
+
+      // Close the dropdown when clicking outside
+      window.addEventListener('click', function (e) {
+        if (!headerRight.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+
+      // Handle dropdown links
+      const dropdownLinks = dropdownMenu.querySelectorAll('a');
+      dropdownLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.stopPropagation(); // Prevent event bubbling
+        });
+      });
+    });
+  </script>
+
+</body>
+
+</html>
