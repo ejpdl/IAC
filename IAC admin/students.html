@@ -131,24 +131,39 @@
     </div>
   </div>
 
+  <script src = "assets/js/fetchs/students_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script>
-    // Sample student data
-    const studentsData = [
-      { id: 'A21-0083', name: 'Asta Calleja', yearLevel: '1st Year', course: 'BSCS' },
-      { id: 'A21-2100', name: 'Luficer Morningstar', yearLevel: '1st Year', course: 'BSCS' },
-      { id: 'A21-2121', name: 'Seki Kaizen', yearLevel: '1st Year', course: 'BSCS' },
-      { id: 'A24-0023', name: 'LeBron James', yearLevel: '1st Year', course: 'BSCS' },
-      { id: 'A23-0609', name: 'Al James', yearLevel: '1st Year', course: 'BSCS' },
-      { id: 'A23-0609', name: 'Al James', yearLevel: '1st Year', course: 'BSCS' },
-      { id: 'A23-0609', name: 'Al James', yearLevel: '1st Year', course: 'BSCS' },
-      // Add more sample students as needed
-    ];
-
+    let studentsData = [];
+    let filteredData = [];
     let currentPage = 1;
     let rowsPerPage = 10;
-    let filteredData = [];
+
+    async function fetchStudents() {
+
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('http://localhost:3000/admin/view-all-students', {
+
+          method: 'GET',
+          headers: {
+
+            'Authorization' : token
+
+          }
+
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch students');
+        }
+        studentsData = await response.json();
+        filteredData = studentsData;
+        renderTable();
+      } catch (error) {
+        console.error(error.message);
+      }
+    }
 
     function renderTable() {
       const tableBody = document.getElementById('tableBody');
@@ -160,20 +175,18 @@
 
       pageData.forEach(student => {
         const row = `
-          <tr style="height: 55px;">
-            <td>${student.id}</td>
-            <td>${student.name}</td>
-            <td>${student.yearLevel}</td>
+          <tr>
+            <td>${student.Student_ID}</td>
+            <td>${student.full_name}</td>
+            <td>${student.year_level}</td>
             <td>${student.course}</td>
             <td>
-              <div class="btn-group" role="group">
-                <button class="btn btn-sm btn-primary me-1" onclick="editStudent('${student.id}')">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-sm btn-danger" onclick="deleteStudent('${student.id}')">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
+              <button class="btn btn-sm btn-primary me-1" onclick="editStudent('${student.Student_ID}')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="deleteStudent('${student.Student_ID}')">
+                <i class="fas fa-trash"></i>
+              </button>
             </td>
           </tr>
         `;
@@ -181,30 +194,6 @@
       });
 
       updatePaginationControls();
-    }
-
-    function updatePaginationControls() {
-      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-      const prevPage = document.getElementById('prevPage');
-      const nextPage = document.getElementById('nextPage');
-      const pageInfo = document.getElementById('currentPageDisplay');
-
-      pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-
-      prevPage.classList.toggle('disabled', currentPage === 1);
-      nextPage.classList.toggle('disabled', currentPage === totalPages);
-    }
-
-    function changePage(delta) {
-      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
-      currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
-      renderTable();
-    }
-
-    function updatePagination() {
-      rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
-      currentPage = 1;
-      renderTable();
     }
 
     function searchTable() {
@@ -226,11 +215,26 @@
       alert('Delete student with ID: ' + studentId);
     }
 
-    // Initialize the table on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      filteredData = studentsData;
+    function updatePaginationControls() {
+      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      document.getElementById('currentPageDisplay').textContent = `Page ${currentPage} of ${totalPages}`;
+      document.getElementById('prevPage').classList.toggle('disabled', currentPage === 1);
+      document.getElementById('nextPage').classList.toggle('disabled', currentPage === totalPages);
+    }
+
+    function changePage(delta) {
+      const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+      currentPage = Math.max(1, Math.min(totalPages, currentPage + delta));
       renderTable();
-    });
+    }
+
+    function updatePagination() {
+      rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
+      currentPage = 1;
+      renderTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchStudents);
   </script>
 </body>
 
