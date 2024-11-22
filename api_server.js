@@ -5,6 +5,8 @@ const moment = require('moment');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+require('moment-timezone');
+
 const secret = 'your_jwt_secret';
 
 const salt = 10;
@@ -38,8 +40,8 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "internet_access_center"
-    // database: "iac"
+    // database: "internet_access_center"
+    database: "iac"
 
 });
 
@@ -405,9 +407,9 @@ app.post('/history/add', async (req, res) => {
 
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
-app.listen(3000, () => {
+app.listen(4000, () => {
 
     console.log(`Server is running at PORT ${PORT}`);
 
@@ -445,11 +447,11 @@ app.get('/api/student/:studentId', (req, res) => {
     });
 });
 
+// <================================== Computer ==================================>
 // Endpoint to request a PC
 app.post('/api/request-pc', (req, res) => {
     const { studentId, pcId } = req.body;
 
-    // First check if student exists
     connection.query('SELECT * FROM students WHERE Student_ID = ?', [studentId], (error, results) => {
         if (error) {
             console.error('Error checking student:', error);
@@ -460,7 +462,6 @@ app.post('/api/request-pc', (req, res) => {
             return res.status(404).json({ error: 'Student not found' });
         }
 
-        // Check if student already has a pending request or is using a PC
         const checkExistingQuery = `
       SELECT * FROM pc_list 
       WHERE Student_ID = ? 
@@ -476,17 +477,12 @@ app.post('/api/request-pc', (req, res) => {
             if (results.length > 0) {
                 const status = results[0].pc_status;
                 if (status === 'Pending') {
-                    return res.status(400).json({
-                        error: `You already have a pending request for PC ${results[0].PC_ID}`
-                    });
+                    return res.status(400).json({ error: `You already have a pending request for PC ${results[0].PC_ID}` });
                 } else {
-                    return res.status(400).json({
-                        error: `You are currently using PC ${results[0].PC_ID}`
-                    });
+                    return res.status(400).json({ error: `You are currently using PC ${results[0].PC_ID}` });
                 }
             }
 
-            // Check if PC is available
             connection.query('SELECT * FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
                 if (error) {
                     console.error('Error checking PC:', error);
@@ -502,7 +498,7 @@ app.post('/api/request-pc', (req, res) => {
                 }
 
                 // Update PC status to Pending
-                const currentDate = new Date().toISOString().slice(0, 10);
+                const currentDate = moment().tz('Asia/Manila').format('YYYY-MM-DD');
                 const updateQuery = `
           UPDATE pc_list 
           SET pc_status = 'Pending', 
@@ -524,28 +520,91 @@ app.post('/api/request-pc', (req, res) => {
     });
 });
 
-app.get('/api/pc-time/:pcId', (req, res) => {
-    const { pcId } = req.params;
 
-    const query = 'SELECT end_time FROM pc_list WHERE PC_ID = ?';
-    connection.query(query, [pcId], (error, results) => {
+app.get('/api/pc-time/:pcId', (req, res) => {
+    const pcId = req.params.pcId;
+
+    connection.query('SELECT end_time, time_used, pc_status FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
         if (error) {
-            console.error('Error fetching time:', error);
+            console.error('Error fetching PC time:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
 
-        if (results.length > 0) {
-            const endTime = results[0].end_time;
-            if (endTime) {
-                const currentTime = new Date();
-                const remainingTime = new Date(endTime) - currentTime;
-                res.json({ isActive: remainingTime > 0, remainingTime });
-            } else {
-                res.json({ isActive: false });
-            }
-        } else {
-            res.status(404).json({ error: 'PC not found' });
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'PC not found' });
         }
+
+        const pc = results[0];
+
+        if (pc.pc_status !== 'Occupied') {
+            return res.json({
+                isActive: false,
+                message: 'Session not active',
+                remainingTime: 0
+            });
+        }
+
+        const currentTime = moment().tz('Asia/Manila');
+        const endTime = moment.tz(pc.end_time, 'HH:mm:ss', 'Asia/Manila')
+            .year(currentTime.year())
+            .month(currentTime.month())
+            .date(currentTime.date());
+
+        const remainingTime = endTime.diff(currentTime);
+
+        // Ensure the remaining time doesn't exceed 1 hour
+        const maxTime = 60 * 60 * 1000; // 1 hour in milliseconds
+        const adjustedRemainingTime = Math.min(remainingTime, maxTime);
+
+        if (adjustedRemainingTime <= 0) {
+            return res.json({
+                isActive: false,
+                message: 'Session ended',
+                remainingTime: 0
+            });
+        }
+
+        res.json({
+            isActive: true,
+            message: 'Session active',
+            remainingTime: adjustedRemainingTime,
+            endTime: endTime.format('HH:mm:ss'),
+            currentTime: currentTime.format('HH:mm:ss')
+        });
     });
 });
+
+// Add new endpoint to fetch session history for a student
+app.get('/api/session-history/:studentId', (req, res) => {
+    const { studentId } = req.params;
+
+    const query = `
+    SELECT 
+      sh.PC_ID,
+      sh.date_used,
+      sh.time_used as start_time,
+      sh.end_time
+    FROM session_history sh
+    WHERE sh.Student_ID = ?
+    ORDER BY sh.date_used DESC, sh.time_used DESC
+  `;
+
+    connection.query(query, [studentId], (error, results) => {
+        if (error) {
+            console.error('Error fetching session history:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+
+        // Format the results to ensure consistency
+        const formattedResults = results.map(result => ({
+            PC_ID: result.PC_ID,
+            date_used: result.date_used,
+            start_time: result.start_time,
+            end_time: result.end_time
+        }));
+
+        res.json(formattedResults);
+    });
+});
+
 

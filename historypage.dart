@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
+import 'package:intl/intl.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -7,20 +11,76 @@ class HistoryPage extends StatefulWidget {
 }
 
 class _HistoryPageState extends State<HistoryPage> {
-  final List<Map<String, String>> sessionHistory = [
-    {'pc': 'PC 1', 'date': '02/21/2024', 'time': '10:00 am'},
-    {'pc': 'PC 2', 'date': '02/21/2024', 'time': '11:00 am'},
-    {'pc': 'PC 21', 'date': '02/25/2024', 'time': '1:00 pm'},
-    {'pc': 'PC 11', 'date': '03/31/2024', 'time': '7:00 pm'},
-    {'pc': 'PC 10', 'date': '10/21/2024', 'time': '7:00 pm'},
-    {'pc': 'PC 12', 'date': '11/21/2024', 'time': '10:21 am'},
-  ];
+  List<Map<String, dynamic>> sessionHistory = [];
+  bool isLoading = true;
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSessionHistory();
+    _refreshTimer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      _fetchSessionHistory();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Cancel the timer when the widget is disposed
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _fetchSessionHistory() async {
+    try {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      final String? studentId = prefs.getString('studentId');
+
+      if (studentId == null) {
+        setState(() {
+          isLoading = false;
+        });
+        return;
+      }
+
+      final response = await http.get(
+        Uri.parse('http://127.0.0.1:4000/api/session-history/$studentId'),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        setState(() {
+          sessionHistory = data.map((session) {
+            final date = DateFormat('MM/dd/yyyy')
+                .format(DateTime.parse(session['date_used']));
+            final startTime = DateFormat('h:mm a')
+                .format(DateFormat('HH:mm:ss').parse(session['start_time']));
+
+            return {
+              'pc': session['PC_ID'],
+              'date': date,
+              'time': startTime,
+            };
+          }).toList();
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load history');
+      }
+    } catch (e) {
+      print('Error fetching session history: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
+          // Background Gradient
           Container(
             height: double.infinity,
             width: double.infinity,
@@ -45,6 +105,8 @@ class _HistoryPageState extends State<HistoryPage> {
               ),
             ),
           ),
+
+          // Foreground Content
           Padding(
             padding: const EdgeInsets.only(top: 150.0),
             child: Container(
@@ -62,83 +124,114 @@ class _HistoryPageState extends State<HistoryPage> {
                 child: Column(
                   children: [
                     const SizedBox(height: 20),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: sessionHistory.length,
-                        itemBuilder: (context, index) {
-                          final session = sessionHistory[index];
-                          return Card(
-                            margin: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 5),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Table(
-                                columnWidths: const {
-                                  0: FlexColumnWidth(2),
-                                  1: FlexColumnWidth(3),
-                                  2: FlexColumnWidth(3),
-                                },
-                                children: [
-                                  const TableRow(
-                                    decoration: BoxDecoration(
-                                      color: Color.fromARGB(255, 128, 0, 0),
-                                    ),
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'PC',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Date',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Time',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  TableRow(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          session['pc']!,
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(session['date']!),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(session['time']!),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+
+                    // Table Header
+                    Table(
+                      columnWidths: const {
+                        0: FlexColumnWidth(2),
+                        1: FlexColumnWidth(3),
+                        2: FlexColumnWidth(3),
+                      },
+                      children: [
+                        TableRow(
+                          decoration: const BoxDecoration(
+                            color: Color.fromARGB(255, 128, 0, 0),
+                          ),
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'PC',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          );
-                        },
-                      ),
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Date',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Time',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    // Session History List
+                    Expanded(
+                      child: isLoading
+                          ? const Center(child: CircularProgressIndicator())
+                          : sessionHistory.isEmpty
+                              ? const Center(
+                                  child: Text(
+                                    'No session history available',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: sessionHistory.length,
+                                  itemBuilder: (context, index) {
+                                    final session = sessionHistory[index];
+                                    return Card(
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 5),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Table(
+                                          columnWidths: const {
+                                            0: FlexColumnWidth(2),
+                                            1: FlexColumnWidth(3),
+                                            2: FlexColumnWidth(3),
+                                          },
+                                          children: [
+                                            TableRow(
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    session['pc']!,
+                                                    style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(session['date']!),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(session['time']!),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                     ),
                   ],
                 ),

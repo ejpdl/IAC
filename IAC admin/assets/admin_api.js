@@ -5,6 +5,8 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
+require('moment-timezone');
+
 const secret = "ADMIN_ADMIN";
 const salt = 10;
 
@@ -29,8 +31,8 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "internet_access_center"
-    // database: "iac"
+    // database: "internet_access_center"
+    database: "iac"
 
 });
 
@@ -457,75 +459,215 @@ function updatePCStatus(status, studentId, pcId, res) {
 }
 
 app.get('/api/pc-time/:pcId', (req, res) => {
-    const { pcId } = req.params;
+    const pcId = req.params.pcId;
 
-    const query = 'SELECT end_time FROM pc_list WHERE PC_ID = ?';
-    connection.query(query, [pcId], (error, results) => {
+    connection.query('SELECT end_time, time_used, pc_status FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
         if (error) {
-            console.error('Error fetching time:', error);
+            console.error('Error fetching PC time:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
 
-        if (results.length > 0) {
-            const endTime = results[0].end_time;
-            if (endTime) {
-                const currentTime = new Date();
-                const remainingTime = new Date(endTime) - currentTime;
-                res.json({ isActive: remainingTime > 0, remainingTime });
-            } else {
-                res.json({ isActive: false });
-            }
-        } else {
-            res.status(404).json({ error: 'PC not found' });
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'PC not found' });
         }
+
+        const pc = results[0];
+
+        if (pc.pc_status !== 'Occupied') {
+            return res.json({
+                isActive: false,
+                message: 'Session not active',
+                remainingTime: 0
+            });
+        }
+
+        const currentTime = moment().tz('Asia/Manila');
+        const endTime = moment.tz(pc.end_time, 'HH:mm:ss', 'Asia/Manila')
+            .year(currentTime.year())
+            .month(currentTime.month())
+            .date(currentTime.date());
+
+        const remainingTime = endTime.diff(currentTime);
+
+        // Ensure the remaining time doesn't exceed 1 hour
+        const maxTime = 60 * 60 * 1000; // 1 hour in milliseconds
+        const adjustedRemainingTime = Math.min(remainingTime, maxTime);
+
+        if (adjustedRemainingTime <= 0) {
+            return res.json({
+                isActive: false,
+                message: 'Session ended',
+                remainingTime: 0
+            });
+        }
+
+        res.json({
+            isActive: true,
+            message: 'Session active',
+            remainingTime: adjustedRemainingTime,
+            endTime: endTime.format('HH:mm:ss'),
+            currentTime: currentTime.format('HH:mm:ss')
+        });
     });
 });
 
+
 app.get('/api/check-expired-sessions', (req, res) => {
-    const updateQuery = `
-    UPDATE pc_list 
-    SET pc_status = 'Available', 
-        Student_ID = NULL, 
-        time_used = NULL, 
-        end_time = NULL
-    WHERE pc_status = 'Occupied' AND end_time < NOW()
+    const now = moment().tz('Asia/Manila');
+    const currentTime = now.format('HH:mm:ss');
+
+    // First get the sessions that will be expired
+    const selectQuery = `
+    SELECT PC_ID, Student_ID, time_used, date_used, end_time 
+    FROM pc_list 
+    WHERE pc_status = 'Occupied' AND TIME(end_time) < ?
   `;
 
-    connection.query(updateQuery, (error, result) => {
+    connection.query(selectQuery, [currentTime], async (error, sessions) => {
         if (error) {
             console.error('Error checking expired sessions:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
 
-        res.json({ updatedSessions: result.affectedRows });
+        try {
+            // Log history for each expired session
+            for (const session of sessions) {
+                await logSessionHistory(
+                    session.PC_ID,
+                    session.Student_ID,
+                    session.time_used,
+                    session.end_time,
+                    session.date_used
+                );
+            }
+
+            // Then update the PC status
+            const updateQuery = `
+        UPDATE pc_list 
+        SET pc_status = 'Available', 
+            Student_ID = NULL, 
+            time_used = NULL, 
+            end_time = NULL
+        WHERE pc_status = 'Occupied' AND TIME(end_time) < ?
+      `;
+
+            connection.query(updateQuery, [currentTime], (error, result) => {
+                if (error) {
+                    console.error('Error updating expired sessions:', error);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                res.json({ updatedSessions: result.affectedRows });
+            });
+        } catch (error) {
+            console.error('Error processing expired sessions:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     });
 });
+
+// <================================== HISTORY ==================================>
+async function logSessionHistory(pcId, studentId, startTime, endTime, date) {
+    const query = `
+    INSERT INTO session_history (Student_ID, PC_ID, date_used, time_used, end_time) 
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+    return new Promise((resolve, reject) => {
+        connection.query(query, [studentId, pcId, date, startTime, endTime], (error, results) => {
+            if (error) {
+                console.error('Error logging session history:', error);
+                reject(error);
+            } else {
+                resolve(results);
+            }
+        });
+    });
+}
 
 app.post('/api/end-session', (req, res) => {
     const { pcId } = req.body;
 
-    const updateQuery = `
-    UPDATE pc_list 
-    SET pc_status = 'Available', 
-        Student_ID = NULL, 
-        time_used = NULL, 
-        end_time = NULL 
-    WHERE PC_ID = ?`;
+    // First get the session details
+    const selectQuery = `
+    SELECT Student_ID, time_used, date_used, end_time 
+    FROM pc_list 
+    WHERE PC_ID = ?
+  `;
 
-    connection.query(updateQuery, [pcId], (error, result) => {
+    connection.query(selectQuery, [pcId], async (error, results) => {
         if (error) {
-            console.error('Error ending session:', error);
+            console.error('Error getting session details:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
-        res.json({ message: 'Session ended successfully' });
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Session not found' });
+        }
+
+        const session = results[0];
+
+        try {
+            // Log the session history
+            await logSessionHistory(
+                pcId,
+                session.Student_ID,
+                session.time_used,
+                session.end_time,
+                session.date_used
+            );
+
+            // Then update the PC status
+            const updateQuery = `
+        UPDATE pc_list 
+        SET pc_status = 'Available', 
+            Student_ID = NULL, 
+            time_used = NULL, 
+            end_time = NULL 
+        WHERE PC_ID = ?
+      `;
+
+            connection.query(updateQuery, [pcId], (error, result) => {
+                if (error) {
+                    console.error('Error ending session:', error);
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                res.json({ message: 'Session ended successfully' });
+            });
+        } catch (error) {
+            console.error('Error processing session end:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
     });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // VIEW SESSION HISTORY
 app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
-    try{
+    try {
 
         const query = `
         SELECT 
@@ -545,7 +687,7 @@ app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
         connection.query(query, (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
@@ -555,7 +697,7 @@ app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 

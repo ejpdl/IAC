@@ -33,12 +33,17 @@ class _RegScreenState extends State<RegScreen> {
   ];
 
   final List<String> courses = [
+
+    'BS in Nursing',
+    'BS In Accountancy',
+    'BS In Hospitality Management',
+    'BS In Tourism Management',
     'BS In Computer Science',
-    'BS In Engineering',
-    'BS In Accountacy',
+    'BA In Psychology',
+    'BS In Computer Engineering',
     'BS In Business Administration',
-    'BS In Education',
-    'BS In Nursing',
+    'B of Elementary Education',
+    'B of Secondary Education',
   ];
 
   // Function to handle registration logic
@@ -76,7 +81,7 @@ class _RegScreenState extends State<RegScreen> {
     });
 
     try {
-      var url = "http://127.0.0.1:3000/userdata/register";
+      var url = "http://127.0.0.1:4000/userdata/register";
 
       final response = await http.post(
         Uri.parse(url),
