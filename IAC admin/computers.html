@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Computers</title>
-  <link rel = "icon" href = "assets/images/logo.png">
+  <link rel="icon" href="assets/images/logo.png">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -20,6 +20,7 @@
 <body>
   <div class="container-fluid">
     <div class="row flex-nowrap">
+      <!-- Sidebar -->
       <!-- Sidebar -->
       <div class="col-auto p-0 bg-dark" id="sidebar">
         <div class="d-flex flex-column align-items-center align-items-sm-start text-white min-vh-100">
@@ -47,10 +48,11 @@
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link px-0 align-middle text-white">
-                <h8><i class="fas fa-certificate icon-size"></i> <span class="ms-1">None</span></h8>
+              <a href="students.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-users icon-size"></i> <span class="ms-1">Student</span></h8>
               </a>
             </li>
+
           </ul>
         </div>
       </div>
@@ -116,7 +118,7 @@
                 <span id="successMessage">Computer added successfully!</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
-              
+
               <div id="errorAlert" class="alert alert-danger alert-dismissible fade show d-none" role="alert">
                 <span id="errorMessage">An error occurred while adding the computer.</span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -141,13 +143,15 @@
                       <form id="ComputerForm">
                         <div class="mb-3">
                           <label for="computerName" class="form-label">Computer Name</label>
-                          <input type="text" class="form-control form-control-lg" id="computerName" placeholder="Enter new computer name"
-                            name="computerName" required>
+                          <input type="text" class="form-control form-control-lg" id="computerName"
+                            placeholder="Enter new computer name" name="computerName" required>
                         </div>
-                        <button type="submit" class="btn mt-3" style="background-color: #800000; color: white;" onclick="addComputers()">Add
+                        <button type="submit" class="btn mt-3" style="background-color: #800000; color: white;"
+                          onclick="addComputers()">Add
                           Computer</button>
-                          <button type="delete" class="btn mt-3" style="background-color: #800000; color: white;" onclick="deleteComputers()">Delete
-                            Computer</button>
+                        <button type="delete" class="btn mt-3" style="background-color: #800000; color: white;"
+                          onclick="deleteComputers()">Delete
+                          Computer</button>
                       </form>
                     </div>
                   </div>
@@ -218,69 +222,69 @@
                         <div class="computer-name"></div>
                         <div class="computer-status available"></div>
                         <div class="computer-user">/div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+                <!-- End of Computer Details Modal -->
               </div>
-              <!-- End of Computer Details Modal -->
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <script src="assets/js/computers_fetch.js"></script>
-  <script src="assets/js/sidebar.js"></script>
-  <script src="assets/js/header.js"></script>
-  <script>
-    function confirmLogout() {
-      var confirmation = confirm("Are you sure you want to log out?");
-      if (confirmation) {
-        // Make an AJAX call to logout
-        fetch('?ajax_logout=true')
-          .then(response => response.json())
-          .then(data => {
-            if (data.status === 'success') {
-              // Redirect to login page
-              window.location.href = '../login.html?logout_success=1';
-            }
-          })
-          .catch(error => {
-            console.error('Logout error:', error);
-            // Fallback redirect
-            window.location.href = '../login.html';
-          });
-      }
-    }
-
-    // DOM ready handler
-    document.addEventListener('DOMContentLoaded', function () {
-      const headerRight = document.querySelector('.header-right');
-      const dropdownMenu = document.querySelector('.dropdown-menu');
-
-      headerRight.addEventListener('click', function (e) {
-        e.preventDefault(); // Prevent default anchor behavior
-        dropdownMenu.classList.toggle('show');
-      });
-
-      // Close the dropdown when clicking outside
-      window.addEventListener('click', function (e) {
-        if (!headerRight.contains(e.target)) {
-          dropdownMenu.classList.remove('show');
+    <script src="assets/js/computers_fetch.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/header.js"></script>
+    <script>
+      function confirmLogout() {
+        var confirmation = confirm("Are you sure you want to log out?");
+        if (confirmation) {
+          // Make an AJAX call to logout
+          fetch('?ajax_logout=true')
+            .then(response => response.json())
+            .then(data => {
+              if (data.status === 'success') {
+                // Redirect to login page
+                window.location.href = '../login.html?logout_success=1';
+              }
+            })
+            .catch(error => {
+              console.error('Logout error:', error);
+              // Fallback redirect
+              window.location.href = '../login.html';
+            });
         }
-      });
+      }
 
-      // Handle dropdown links
-      const dropdownLinks = dropdownMenu.querySelectorAll('a');
-      dropdownLinks.forEach(link => {
-        link.addEventListener('click', function (e) {
-          e.stopPropagation(); // Prevent event bubbling
+      // DOM ready handler
+      document.addEventListener('DOMContentLoaded', function () {
+        const headerRight = document.querySelector('.header-right');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+
+        headerRight.addEventListener('click', function (e) {
+          e.preventDefault(); // Prevent default anchor behavior
+          dropdownMenu.classList.toggle('show');
+        });
+
+        // Close the dropdown when clicking outside
+        window.addEventListener('click', function (e) {
+          if (!headerRight.contains(e.target)) {
+            dropdownMenu.classList.remove('show');
+          }
+        });
+
+        // Handle dropdown links
+        const dropdownLinks = dropdownMenu.querySelectorAll('a');
+        dropdownLinks.forEach(link => {
+          link.addEventListener('click', function (e) {
+            e.stopPropagation(); // Prevent event bubbling
+          });
         });
       });
-    });
-  </script>
+    </script>
 
 </body>
 

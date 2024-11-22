@@ -47,11 +47,9 @@
                 <h8><i class="fas fa-clock icon-size"></i> <span class="ms-1">History</span></h8>
               </a>
             </li>
-
-
             <li>
-              <a href="#" class="nav-link px-0 align-middle text-white">
-                <h8><i class="fas fa-certificate icon-size"></i> <span class="ms-1">None</span></h8>
+              <a href="students.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-users icon-size"></i> <span class="ms-1">Student</span></h8>
               </a>
             </li>
           </ul>
@@ -70,7 +68,7 @@
               <div class="header-right">
                 <a href="#">
                   <i class="fas fa-user"></i>
-                  <span class="account-name" id = "account-name">Username</span>
+                  <span class="account-name" id="account-name">Username</span>
                 </a>
                 <i class="fas fa-chevron-down"></i>
 
@@ -96,15 +94,15 @@
             <div class="shape rectangle bg-primary me-3 d-flex align-items-center">
               <!-- Icon or Image on the left -->
               <div class="rectangle-icon me-3">
-                <img src="assets/images/lebron.jpg" id = "changeable-image" alt="Icon" class="icon-img">
+                <img src="assets/images/lebron.jpg" id="changeable-image" alt="Icon" class="icon-img">
               </div>
               <div>
                 <h3>Welcome, <br><span id="fullname">Name</span></h3>
-                <p id = "date">Date</p>
-                <a href = "computers.html">
-                <button class="btn btn-light" id="manageComputersBtn"><i class="fas fa-desktop-alt icon-size"
-                    style="font-size: 1rem;"></i>Manage Computers</button>
-                  </a>
+                <p id="date">Date</p>
+                <a href="computers.html">
+                  <button class="btn btn-light" id="manageComputersBtn"><i class="fas fa-desktop-alt icon-size"
+                      style="font-size: 1rem;"></i>Manage Computers</button>
+                </a>
               </div>
             </div>
             <!-- Square 1 -->
@@ -115,7 +113,8 @@
                 <span class="mt-4 mb-4" style="font-size: 35px; color: white; margin-left: 10px;">Available Computers
                 </span>
               </div>
-              <a href="computers.html" class="d-flex justify-content-end" style="text-decoration: none; color: gray;">click here to continue</a>
+              <a href="computers.html" class="d-flex justify-content-end"
+                style="text-decoration: none; color: gray;">click here to continue</a>
               <div class="d-flex justify-content-end" style="border-top: 3px solid #ffffff; margin-top: 5px;">
                 <!-- Number below the line -->
                 <span class="" id="availablePCCount" style="color: #ffffff; font-size: 50px;">0</span>
@@ -130,10 +129,12 @@
                 <span class="mt-4 mb-4" style="font-size: 35px; color: maroon; margin-left: 10px;">History Sessions
                 </span>
               </div>
-              <a href="history.html" class="d-flex justify-content-end" style="text-decoration: none; color: gray;">click here to continue</a>
+              <a href="history.html" class="d-flex justify-content-end"
+                style="text-decoration: none; color: gray;">click here to continue</a>
               <div class="d-flex justify-content-end" style="border-top: 3px solid maroon; margin-top: 5px;">
                 <!-- Number below the line -->
-                <span class="" id = "history" style="color: maroon; font-size: 50px;">0</span> <!-- Replace 5 with dynamic value -->
+                <span class="" id="history" style="color: maroon; font-size: 50px;">0</span>
+                <!-- Replace 5 with dynamic value -->
               </div>
             </div>
           </div>
@@ -192,7 +193,7 @@
 
 
 
-  <script src = "assets/js/dashboard_fetch.js"></script>
+  <script src="assets/js/dashboard_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -335,26 +336,26 @@
         }]
       },
       options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: {
-            font: {
-              size: 14
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'top',
+            labels: {
+              font: {
+                size: 14
+              }
             }
+          },
+          tooltip: {
+            enabled: true
           }
-        },
-        tooltip: {
-          enabled: true
         }
       }
-    }
-  });
+    });
 
   </script>
 
-  
+
 
 </body>
 
