@@ -31,8 +31,8 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    // database: "internet_access_center"
-    database: "iac"
+    database: "internet_access_center"
+    // database: "iac"
 
 });
 
@@ -341,6 +341,47 @@ app.post('/delete/pc', verifyToken, (req, res) => {
 
 
 
+
+// VIEW SESSION HISTORY
+app.get(`/admin/session-history`, verifyToken, async (req, res) => {
+
+    try{
+
+        const query = `
+        SELECT 
+        session_history.PC_ID, 
+        session_history.Student_ID, 
+        CONCAT(students.first_name, ' ', students.last_name) AS full_name, 
+        DATE_FORMAT(session_history.date_used, '%Y-%m-%d') AS date_used, 
+        TIME_FORMAT(session_history.time_used, '%H:%i:%s') AS time_used
+        FROM 
+            session_history
+        JOIN 
+            students
+        ON 
+        session_history.student_id = students.student_id;
+
+        `;
+
+        connection.query(query, (err, rows) => {
+
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            res.status(200).json(rows);
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
 
 
 
@@ -766,9 +807,96 @@ app.get(`/admin/course-usage`, verifyToken, async (req, res) => {
 });
 
 
+// VIEW ALL STUDENTS
+app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
+
+    try{
+
+        const query = `SELECT 
+                            Student_ID,
+                            CONCAT(first_name, ' ', last_name) AS full_name,
+                            year_level,
+                            course
+                        FROM students;`;
+
+        connection.query(query, (err, rows) => {
+
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            res.status(200).json(rows);
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
 
 
+// EDIT STUDENT DATA
+app.put(`/admin/edit-student/`, async (req, res) => {
 
+    const { first_name, last_name, year_level, course, Student_ID } = req.body;
+
+    try{
+
+        const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?  WHERE Student_ID = ?`;
+
+        connection.query(query, [first_name, last_name, year_level, course, Student_ID], (err, results) => {
+
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            if (results.affectedRows === 0) {
+                
+                return res.status(404).json({ error: `No record found to update.` });
+            
+            }
+
+            console.log(`Successfully updated Student with Student ID: ${Student_ID}`);
+            res.status(200).json({ msg: `Successfully Updated!` });
+
+        })
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
+
+
+// DELETE A STUDENT
+app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
+
+    const { Student_ID } = req.params;
+
+    const query = `DELETE FROM students WHERE Student_ID = ?`;
+
+    connection.query(query, [Student_ID], (err, rows) => {
+
+        if(err){
+
+            return res.status(500).json({ error: err.message });
+
+        }
+
+        res.status(200).json({ msg: `Successfully Deleted!` });
+
+    });
+
+});
 
 
 
