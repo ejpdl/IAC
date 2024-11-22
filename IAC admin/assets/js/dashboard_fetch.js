@@ -104,3 +104,41 @@ async function AvailablePc() {
     }
 }
 AvailablePc();
+
+async function SessionHistory(){
+
+    const token = localStorage.getItem('token');
+
+    if(!token){
+
+        console.log(`Error`);
+
+    }
+
+    try{
+
+        const response = await fetch(`http://localhost:3000/admin/session-history`, {
+
+            method: 'GET',
+            headers: {
+
+                'Authorization' :   token,
+                'Content-Type'  :   'application/json'
+
+            }
+
+        });
+
+        const result = await response.json();
+
+        document.querySelector(`#history`).textContent = result.length;
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+SessionHistory();
