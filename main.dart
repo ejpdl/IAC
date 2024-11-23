@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:internet_access_control/WelcomeScreen.dart';
+import 'splash_screen.dart';
 
 void main() {
   runApp(const MainApp());
@@ -16,7 +16,7 @@ class MainApp extends StatelessWidget {
         fontFamily: ('inter'),
         useMaterial3: true,
       ),
-      home: WelcomeScreen(),
+      home: SplashScreen(),
     );
   }
 }

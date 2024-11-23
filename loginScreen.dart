@@ -46,23 +46,23 @@ class _LoginScreenState extends State<LoginScreen> {
         final responseBody = jsonDecode(response.body);
         // Save student ID to SharedPreferences
         if (responseBody['token'] != null) {
-        final token = responseBody['token'];
+          final token = responseBody['token'];
 
-        // Save token and student ID to SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('authToken', token); // Save the token
-        await prefs.setString('studentId', sid);   // Save the student ID
+          // Save token and student ID to SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('authToken', token); // Save the token
+          await prefs.setString('studentId', sid); // Save the student ID
 
-        // Navigate to homepage
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Homepage()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed: No token received.')),
-        );
-      }
+          // Navigate to homepage
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const Homepage()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Login failed: No token received.')),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login Failed: ${response.statusCode}')),
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 70), // Added for spacing at the top
                     TextField(
                       controller: _sidController, // Link controller
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         suffixIcon: Icon(Icons.check, color: Colors.grey),
                         label: Text(
@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _passwordController, // Link controller
                       obscureText: _obscureText,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         suffixIcon: IconButton(
                           icon: Icon(

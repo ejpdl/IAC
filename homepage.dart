@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'computerpage.dart';
 import 'historypage.dart';
+import 'ManageProfilePage.dart';
 
 void main() {
   runApp(MyApp());
@@ -41,6 +42,7 @@ class _HomepageState extends State<Homepage> {
     HomePage(), // Home page (default after sign-in)
     ComputerPage(),
     HistoryPage(),
+    ManageProfilePage(),
   ];
 
   // This ensures we go directly to the home page after sign-in
@@ -66,6 +68,7 @@ class _HomepageState extends State<Homepage> {
           FluidNavBarIcon(icon: Icons.person),
           FluidNavBarIcon(icon: Icons.computer_sharp),
           FluidNavBarIcon(icon: Icons.history),
+          FluidNavBarIcon(icon: Icons.settings),
         ],
         onChange: _handleNavigationChange,
         style: const FluidNavBarStyle(
@@ -86,7 +89,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  File? _image;
   String firstName = '';
   String lastName = '';
   bool isLoading = true;
@@ -138,18 +140,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      if (pickedFile != null) {
-        _image = File(pickedFile.path);
-      } else {
-        _image = null;
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -178,7 +168,7 @@ class _HomePageState extends State<HomePage> {
               height: double.infinity,
               width: double.infinity,
               child: Padding(
-                padding: EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -190,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                         fontWeight: FontWeight.w300,
                       ),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     isLoading
                         ? const CircularProgressIndicator(
                             valueColor: AlwaysStoppedAnimation<Color>(
@@ -234,31 +224,26 @@ class _HomePageState extends State<HomePage> {
           Positioned(
             top: 75,
             left: (MediaQuery.of(context).size.width - 250) / 2,
-            child: GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                height: 250,
-                width: 250,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 7),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
-                      spreadRadius: 5,
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
-                    ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: _image != null
-                      ? Image.file(_image!, fit: BoxFit.cover)
-                      : Image.asset(
-                          'assets/profile_picture.png',
-                          fit: BoxFit.cover,
-                        ),
-                ),
+            child: Container(
+              height: 250,
+              width: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey.shade300,
+                border: Border.all(color: Colors.white, width: 7),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.3),
+                    spreadRadius: 5,
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: const Icon(
+                Icons.person,
+                size: 200,
+                color: Color.fromARGB(255, 128, 0, 0),
               ),
             ),
           ),

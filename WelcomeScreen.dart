@@ -18,16 +18,18 @@ class WelcomeScreen extends StatelessWidget {
       ])),
       child: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 200.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 150.0),
             child: Center(
-              child: Image(
-                image: AssetImage(''),
+              child: Image.asset(
+                'assets/images/iac_logo_b.jpg',
+                width: 250,
+                height: 250,
               ),
             ),
           ),
           const SizedBox(
-            height: 100,
+            height: 70,
           ),
           const Text(
             'Welcome to IAC',
