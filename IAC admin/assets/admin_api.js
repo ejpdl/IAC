@@ -31,8 +31,8 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "internet_access_center"
-    // database: "iac"
+    // database: "internet_access_center"
+    database: "iac"
 
 });
 
@@ -345,7 +345,7 @@ app.post('/delete/pc', verifyToken, (req, res) => {
 // VIEW SESSION HISTORY
 app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
-    try{
+    try {
 
         const query = `
         SELECT 
@@ -365,7 +365,7 @@ app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
         connection.query(query, (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
@@ -375,7 +375,7 @@ app.get(`/admin/session-history`, verifyToken, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -810,7 +810,7 @@ app.get(`/admin/course-usage`, verifyToken, async (req, res) => {
 // VIEW ALL STUDENTS
 app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
 
-    try{
+    try {
 
         const query = `SELECT 
                             Student_ID,
@@ -821,7 +821,7 @@ app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
 
         connection.query(query, (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
@@ -831,7 +831,7 @@ app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -845,22 +845,22 @@ app.put(`/admin/edit-student/`, async (req, res) => {
 
     const { first_name, last_name, year_level, course, Student_ID } = req.body;
 
-    try{
+    try {
 
         const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?  WHERE Student_ID = ?`;
 
         connection.query(query, [first_name, last_name, year_level, course, Student_ID], (err, results) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
             if (results.affectedRows === 0) {
-                
+
                 return res.status(404).json({ error: `No record found to update.` });
-            
+
             }
 
             console.log(`Successfully updated Student with Student ID: ${Student_ID}`);
@@ -868,7 +868,7 @@ app.put(`/admin/edit-student/`, async (req, res) => {
 
         })
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -886,7 +886,7 @@ app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
 
     connection.query(query, [Student_ID], (err, rows) => {
 
-        if(err){
+        if (err) {
 
             return res.status(500).json({ error: err.message });
 
@@ -898,6 +898,56 @@ app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
 
 });
 
+// Endpoint to get year-level usage data for a specific month
+app.get('/api/year-level-usage/:month', (req, res) => {
+    const { month } = req.params;
+
+    const query = `
+      SELECT s.year_level, COUNT(sh.session_id) AS usage_count
+      FROM session_history sh
+      JOIN students s ON sh.Student_ID = s.Student_ID
+      WHERE MONTH(sh.date_used) = ?
+      GROUP BY s.year_level
+      ORDER BY s.year_level ASC
+    `;
+
+    connection.query(query, [month], (err, results) => {  // Use 'connection' instead of 'db'
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+        } else {
+            res.json(results);
+        }
+    });
+});
+
+// Department usage API
+app.get('/api/department-usage', (req, res) => {
+    const month = req.query.month; // Get selected month from query params
+
+    const query = `
+    SELECT s.course, COUNT(sh.session_id) AS usage_count
+    FROM session_history sh
+    JOIN students s ON sh.Student_ID = s.Student_ID
+    WHERE MONTH(sh.date_used) = ? 
+    GROUP BY s.course
+    ORDER BY usage_count DESC;
+    `;
+
+    connection.query(query, [month], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ message: 'Database error', error: err });
+        }
+
+        const departmentUsageData = results.map(result => ({
+            department: result.course, // Department name (course)
+            usageCount: result.usage_count, // Usage count for that department
+        }));
+
+        res.json(departmentUsageData); // Send the data as JSON
+    });
+});
 
 
 const PORT = process.env.PORT || 3000;

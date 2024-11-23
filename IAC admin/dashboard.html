@@ -15,6 +15,7 @@
 
 <style>
 
+
 </style>
 
 <body>
@@ -52,6 +53,7 @@
                 <h8><i class="fas fa-users icon-size"></i> <span class="ms-1">Student</span></h8>
               </a>
             </li>
+
           </ul>
         </div>
       </div>
@@ -99,9 +101,10 @@
               <div>
                 <h3>Welcome, <br><span id="fullname">Name</span></h3>
                 <p id="date">Date</p>
-                <a href="computers.html">
-                  <button class="btn btn-light" id="manageComputersBtn"><i class="fas fa-desktop-alt icon-size"
-                      style="font-size: 1rem;"></i>Manage Computers</button>
+                <a href="#" data-toggle="modal" data-target="#editProfileModal">
+                  <button class="btn btn-info" id="editProfileBtn">
+                    <i class="fas fa-pencil-alt icon-size" style="font-size: 1rem;"></i> Edit Profile
+                  </button>
                 </a>
               </div>
             </div>
@@ -145,44 +148,42 @@
               <h1 class="text text-center mt-0">Year Level Usage Graph</h1>
               <div class="mt-5">
                 <select class="form-select" id="yearLevelMonthDropdown" aria-label="Select Month">
-                  <option value="january">January</option>
-                  <option value="february">February</option>
-                  <option value="march">March</option>
-                  <option value="april">April</option>
-                  <option value="may">May</option>
-                  <option value="june">June</option>
-                  <option value="july">July</option>
-                  <option value="august">August</option>
-                  <option value="september">September</option>
-                  <option value="october">October</option>
-                  <option value="november">November</option>
-                  <option value="december">December</option>
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
                 </select>
               </div>
               <canvas id="yearLevelChart" class="my-3"></canvas>
             </div>
 
-            <!-- Department Usage Graph -->
             <div class="shape square2 bg-secondary">
               <h1 class="text text-center mt-3">Department Usage Graph</h1>
-              <div class="">
-                <select class="form-select" id="yearLevelMonthDropdown" aria-label="Select Month">
-                  <option value="january">January</option>
-                  <option value="february">February</option>
-                  <option value="march">March</option>
-                  <option value="april">April</option>
-                  <option value="may">May</option>
-                  <option value="june">June</option>
-                  <option value="july">July</option>
-                  <option value="august">August</option>
-                  <option value="september">September</option>
-                  <option value="october">October</option>
-                  <option value="november">November</option>
-                  <option value="december">December</option>
+              <div>
+                <select class="form-select" id="courseUsageMonthDropdown" aria-label="Select Month">
+                  <option value="1">January</option>
+                  <option value="2">February</option>
+                  <option value="3">March</option>
+                  <option value="4">April</option>
+                  <option value="5">May</option>
+                  <option value="6">June</option>
+                  <option value="7">July</option>
+                  <option value="8">August</option>
+                  <option value="9">September</option>
+                  <option value="10">October</option>
+                  <option value="11">November</option>
+                  <option value="12">December</option>
                 </select>
               </div>
-              <canvas id="departmentUsageChart" class="my-3" style="max-width: 60%; height: 100px;"></canvas>
-              <!-- Added canvas for department pie chart -->
+              <canvas id="departmentUsageChart" class="my-3" style="max-width: 60%; height: 300px;"></canvas>
             </div>
           </div>
         </div>
@@ -190,9 +191,57 @@
     </div>
   </div>
 
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="background-color: white; color: maroon;">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" style="color: maroon; font-size: 1.5rem;">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editProfileForm">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Enter Username"
+                required>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password"
+                required>
+            </div>
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name"
+                required>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name"
+                required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" style="background-color: #800000;"
+            data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-danger" style="background-color: #800000;" id="saveProfileBtn">Save
+            Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
 
+  <!-- Bootstrap JS, Popper.js, and jQuery (ensure these are included in your project) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script src="assets/js/dashboard_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
@@ -246,19 +295,97 @@
     });
   </script>
 
+
+
+  <script>
+    // Department Usage Pie Chart
+    const deptCtx = document.getElementById('departmentUsageChart').getContext('2d');
+
+    // Fetch department usage data for the selected month
+    const fetchDepartmentUsageData = async (month) => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/department-usage?month=${month}`);
+        const data = await response.json();
+
+        const departmentNames = data.map(item => item.department);
+        const usageCounts = data.map(item => item.usageCount);
+
+        // Now render the chart with the fetched data
+        renderDepartmentUsageChart(departmentNames, usageCounts);
+
+      } catch (error) {
+        console.error("Error fetching department usage data:", error);
+      }
+    };
+
+    let departmentUsageChart = null; // Global variable to track the chart instance
+
+    // Render the department usage chart
+    const renderDepartmentUsageChart = (departments, usageCounts) => {
+      // Destroy existing chart if it exists
+      if (departmentUsageChart) {
+        departmentUsageChart.destroy();
+      }
+
+      departmentUsageChart = new Chart(deptCtx, {
+        type: 'pie',
+        data: {
+          labels: departments,
+          datasets: [{
+            data: usageCounts,
+            backgroundColor: [
+              '#800000', '#b53030', '#e77272', '#eea6a6', '#e6c2c2',
+              '#2a5d84', '#b530b5', '#1f6d1f', '#b5b530', '#b53050'
+            ],
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                font: {
+                  size: 14
+                }
+              }
+            },
+            tooltip: {
+              enabled: true
+            }
+          }
+        }
+      });
+    };
+
+    // Event listener for the month dropdown
+    const monthDropdown = document.getElementById('courseUsageMonthDropdown');
+    monthDropdown.addEventListener('change', (event) => {
+      const selectedMonth = event.target.value;
+      fetchDepartmentUsageData(selectedMonth);
+    });
+
+    // Set the dropdown to the current month on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentMonth = new Date().getMonth() + 1;
+      const monthDropdown = document.getElementById('courseUsageMonthDropdown');
+      monthDropdown.value = currentMonth;
+    });
+    // Initial chart rendering using the current month
+    fetchDepartmentUsageData(new Date().getMonth() + 1);
+  </script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-      // Existing code ...
-
-      // Bar graph for Year Level Usage
+      // Create an empty chart initially
       const ctx = document.getElementById('yearLevelChart').getContext('2d');
       const yearLevelChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: ['1st Year', '2nd Year', '3rd Year', '4th Year'], // Customize with actual year levels
+          labels: [],  // Initial empty labels
           datasets: [{
             label: 'Usage Count',
-            data: [30, 45, 25, 50], // Replace with actual data
+            data: [],  // Initial empty data
             backgroundColor: ['#800000', '#b53030', '#e77272', '#eea6a6'], // Colors for each bar
           }]
         },
@@ -266,7 +393,7 @@
           responsive: true,
           plugins: {
             legend: {
-              display: false // Hide legend if not needed
+              display: false  // Hide legend if not needed
             },
             tooltip: {
               enabled: true
@@ -277,21 +404,15 @@
               title: {
                 display: true,
                 text: 'Year Level',
-                color: '#800000', // Maroon color for axis title
-                font: {
-                  weight: 'bold', // Bold title font
-                  size: 16
-                }
+                color: '#800000',
+                font: { weight: 'bold', size: 16 }
               },
               ticks: {
-                color: '#800000', // Maroon color for x-axis labels
-                font: {
-                  weight: 'bold', // Bold x-axis labels
-                  size: 14
-                }
+                color: '#800000',
+                font: { weight: 'bold', size: 14 }
               },
               grid: {
-                color: 'rgba(128, 0, 0, 0.2)', // Maroon-colored, semi-transparent grid lines
+                color: 'rgba(128, 0, 0, 0.2)',
                 lineWidth: 1.5
               }
             },
@@ -299,22 +420,16 @@
               title: {
                 display: true,
                 text: 'Usage Count',
-                color: '#800000', // Maroon color for axis title
-                font: {
-                  weight: 'bold', // Bold title font
-                  size: 16
-                }
+                color: '#800000',
+                font: { weight: 'bold', size: 16 }
               },
               ticks: {
-                color: '#800000', // Maroon color for y-axis labels
-                font: {
-                  weight: 'bold', // Bold y-axis labels
-                  size: 14
-                },
+                color: '#800000',
+                font: { weight: 'bold', size: 14 },
                 stepSize: 10
               },
               grid: {
-                color: 'rgba(128, 0, 0, 0.2)', // Maroon-colored, semi-transparent grid lines
+                color: 'rgba(128, 0, 0, 0.2)',
                 lineWidth: 1.5
               },
               beginAtZero: true
@@ -322,40 +437,36 @@
           }
         }
       });
-    });
 
-    // Department Usage Pie Chart
-    const deptCtx = document.getElementById('departmentUsageChart').getContext('2d');
-    const departmentUsageChart = new Chart(deptCtx, {
-      type: 'pie',
-      data: {
-        labels: ['CCS', 'CTELA', 'CNHAS', 'BSA', 'CITHM'], // Customize department names
-        datasets: [{
-          data: [40, 25, 20, 15, 10], // Replace with actual data
-          backgroundColor: ['#800000', '#b53030', '#e77272', '#eea6a6', '#e6c2c2'],
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              font: {
-                size: 14
-              }
-            }
-          },
-          tooltip: {
-            enabled: true
-          }
-        }
-      }
+      // Get the month dropdown element
+      const monthDropdown = document.getElementById('yearLevelMonthDropdown');
+
+      // Set the dropdown to the current month
+      const currentMonth = new Date().getMonth() + 1;
+      monthDropdown.value = currentMonth;
+      // Function to fetch and update the chart data based on the selected month
+      monthDropdown.addEventListener('change', function () {
+        const selectedMonth = this.value;
+
+        fetch(`http://localhost:3000/api/year-level-usage/${selectedMonth}`)
+          .then(response => response.json())
+          .then(data => {
+            const labels = data.map(item => item.year_level);
+            const usageCounts = data.map(item => item.usage_count);
+
+            // Update chart data
+            yearLevelChart.data.labels = labels;
+            yearLevelChart.data.datasets[0].data = usageCounts;
+            yearLevelChart.update();  // Refresh the chart with new data
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      });
+
+      // Trigger data fetch for the current month
+      monthDropdown.dispatchEvent(new Event('change'));
     });
 
   </script>
-
-
 
 </body>
 
