@@ -419,9 +419,29 @@ app.listen(4000, () => {
 
 
 
-
-
-
+app.put('/api/studprofile/:studentId', (req, res) => {
+    const studentId = req.params.studentId;
+    const { first_name, last_name, year_level, course } = req.body;
+    
+    const query = `
+        UPDATE students 
+        SET first_name = ?, last_name = ?, year_level = ?, course = ? 
+        WHERE Student_ID = ?
+    `;
+    
+    connection.query(query, [first_name, last_name, year_level, course, studentId], (error, results) => {
+        if (error) {
+            console.error('Error updating student:', error);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        
+        if (results.affectedRows === 0) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+        
+        res.json({ message: 'Profile updated successfully' });
+    });
+});
 
 // Endpoint to request a PC
 app.get('/api/student/:studentId', (req, res) => {
