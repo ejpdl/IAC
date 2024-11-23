@@ -98,3 +98,49 @@ body {
   height: 700px;
   /* Increase height to make the graph taller */
 }
+
+
+.modal .form-control {
+  height: 45px;
+  font-size: 1rem;
+  max-width: 90%;
+  /* Ensure inputs are responsive */
+}
+
+#username {
+  margin-left: 0;
+  font-size: 1rem !important;
+
+}
+
+.modal .btn-light {
+  background-color: #fff;
+  color: #800000;
+}
+
+.modal-header,
+.modal-footer {
+  background-color: white;
+  color: maroon;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+}
+
+/* Custom styling for close button */
+.close {
+  background: none;
+  border: none;
+  color: #800000 !important;
+  /* Maroon color */
+  font-size: 1.5rem;
+}
+
+.close:hover,
+.close:focus {
+  color: maroon;
+  /* Change color on hover or focus */
+  text-decoration: none;
+  opacity: 0.7;
+}

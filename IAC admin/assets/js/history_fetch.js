@@ -2,78 +2,78 @@
 async function loadData() {
 
     const token = localStorage.getItem('token');
-  
+
     if (!token) {
-  
-      alert(`No token found. Please log in again`);
-      return;
-  
-    }
-  
-    try {
-  
-      const response = await fetch(`http://localhost:3000/admin/details`, {
-  
-        method: 'GET',
-        headers: {
-  
-          'Authorization': token
-  
-        }
-  
-      });
-  
-      if (!response.ok) {
-  
-        const ErrorData = await response.json();
-        console.error(`Error`, ErrorData);
-        throw new Error(ErrorData.msg || `Failed to fetch the admin data`);
-  
-      }
-  
-      const data = await response.json();
-  
-      document.querySelector(`#account-name`).textContent = data.username;
-  
-  
-    } catch (error) {
-  
-      console.log(error);
-  
-    }
-  
-  }
-  
-  loadData();
-  
-
-// DISPLAY SESSION HISTORY
-async function SessionHistory(){
-
-    const token = localStorage.getItem('token');
-
-    if(!token){
 
         alert(`No token found. Please log in again`);
         return;
 
     }
 
-    try{
+    try {
+
+        const response = await fetch(`http://localhost:3000/admin/details`, {
+
+            method: 'GET',
+            headers: {
+
+                'Authorization': token
+
+            }
+
+        });
+
+        if (!response.ok) {
+
+            const ErrorData = await response.json();
+            console.error(`Error`, ErrorData);
+            throw new Error(ErrorData.msg || `Failed to fetch the admin data`);
+
+        }
+
+        const data = await response.json();
+
+        document.querySelector(`#account-name`).textContent = data.username;
+
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+}
+
+loadData();
+
+
+// DISPLAY SESSION HISTORY
+async function SessionHistory() {
+
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+
+        alert(`No token found. Please log in again`);
+        return;
+
+    }
+
+    try {
 
         const response = await fetch(`http://localhost:3000/admin/session-history`, {
 
             method: 'GET',
             headers: {
 
-                'Authorization' :  token,
-                'Content-Type'  :  'application/json'
+                'Authorization': token,
+                'Content-Type': 'application/json'
 
             }
 
         });
 
-        if(!response.ok){
+        if (!response.ok) {
 
             const ErrorData = await response.json();
             console.error(`Error`, ErrorData);
@@ -84,7 +84,7 @@ async function SessionHistory(){
         const sessionHistory = await response.json();
 
         const tableBody = document.getElementById("sessionHistoryTable");
-        tableBody.innerHTML = ""; 
+        tableBody.innerHTML = "";
 
         sessionHistory.forEach(session => {
             const row = document.createElement("tr");
@@ -104,7 +104,7 @@ async function SessionHistory(){
             tableBody.appendChild(row);
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
