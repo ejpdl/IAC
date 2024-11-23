@@ -37,6 +37,8 @@ login.addEventListener('submit', async (event) => {
         if(response.ok){
 
             localStorage.setItem('token', result.token);
+            const tokenPayload = JSON.parse(atob(result.token.split('.')[1]));
+            localStorage.setItem('adminId', tokenPayload.Admin_ID);
             window.location.href = result.redirectUrl,
             alert(`Welcome, ${username}`);
 

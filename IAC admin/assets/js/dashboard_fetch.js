@@ -6,59 +6,59 @@ function updateDateTime() {
 
     const formattedDate = now.toLocaleDateString("en-US", {
 
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
 
     });
 
     const formattedTime = now.toLocaleTimeString("en-US", {
 
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
 
     });
 
     dateElement.textContent = `${formattedDate}, ${formattedTime}`;
-}
+  }
 
-updateDateTime();
-setInterval(updateDateTime, 1000);
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
 
 
 // DISPLAY THE DATA OF THE USER
-async function loadData() {
+async function loadData(){
 
     const token = localStorage.getItem('token');
-
-    if (!token) {
+    
+    if(!token){
 
         alert(`No token found. Please log in again`);
         return;
 
     }
 
-    try {
+    try{
 
         const response = await fetch(`http://localhost:3000/admin/details`, {
 
             method: 'GET',
             headers: {
 
-                'Authorization': token
+                'Authorization' :   token
 
             }
-
+        
         });
 
-        if (!response.ok) {
+        if(!response.ok){
 
             const ErrorData = await response.json();
             console.error(`Error`, ErrorData);
             throw new Error(ErrorData.msg || `Failed to fetch the admin data`);
-
+        
         }
 
         const data = await response.json();
@@ -69,7 +69,7 @@ async function loadData() {
         document.querySelector(`#account-name`).textContent = data.username;
 
 
-    } catch (error) {
+    }catch(error){
 
         console.log(error);
 
@@ -79,48 +79,232 @@ async function loadData() {
 
 loadData();
 
+
 // FETCH ALL AVAILABLE PC
-async function AvailablePc() {
+async function AvailablePc(){
+
     const token = localStorage.getItem('token');
-    if (!token) {
+
+    if(!token){
+
         console.log(`No token found. Please Log in again`);
         return;
+
     }
-    try {
+
+    try{
+
         const response = await fetch(`http://localhost:3000/view_all/pc`, {
+
             method: 'GET',
             headers: {
-                'Authorization': token,
+
+                'Authorization' :  token,
+
+
             }
+
         });
-        if (!response.ok) {
+
+        if(!response.ok){
+
             throw new Error(`Failed to fetch the available pc`);
+
         }
+
         const pcList = await response.json();
+
         const availablePCs = pcList.filter(pc => pc.pc_status.toLowerCase() === 'available');
+
         document.getElementById("availablePCCount").textContent = availablePCs.length;
-    } catch (error) {
+
+
+    }catch(error){
+
         console.log(error);
+
     }
+
 }
+
 AvailablePc();
-async function SessionHistory() {
+
+// FETCH ALL HISTORY SESSION
+async function SessionHistory(){
+
     const token = localStorage.getItem('token');
-    if (!token) {
-        console.log(`Error`);
+
+    if(!token){
+
+        console.log(`No token found. Please Log in again`);
+        return;
+
     }
-    try {
+
+    try{
+
         const response = await fetch(`http://localhost:3000/admin/session-history`, {
+
             method: 'GET',
             headers: {
-                'Authorization': token,
-                'Content-Type': 'application/json'
+
+                'Authorization' :   token,
+                'Content-Type'  :   'application/json',
+
             }
+
         });
+
         const result = await response.json();
+
+        if(!response.ok){
+
+            throw new Error(`Failed to fetch the session history`);
+
+        }
+
         document.querySelector(`#history`).textContent = result.length;
-    } catch (error) {
+
+
+    }catch(error){
+
         console.log(error);
+
     }
+
 }
+
 SessionHistory();
+
+
+
+// Modify the Edit Profile button to remove the hardcoded ID
+document.addEventListener('DOMContentLoaded', function() {
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    editProfileBtn.onclick = function() {
+        const currentAdminId = localStorage.getItem('adminId');
+        if (!currentAdminId) {
+            alert('Please log in again');
+            return;
+        }
+        EditAdmin(currentAdminId);
+    };
+});
+
+// EDIT ADMIN
+async function EditAdmin(Admin_ID){
+
+    const token = localStorage.getItem('token');
+
+    if(!token){
+
+        console.log(`No token found. Please Log in again`);
+        return;
+
+    }
+
+    try{
+
+        const response = await fetch(`http://localhost:3000/admin/view/${Admin_ID}`, {
+
+            method: 'GET',
+            headers: {
+
+                'Authorization' :  token,
+                'Content-Type': 'application/json'
+
+            }
+
+        });
+
+        const data = await response.json();
+
+        if(data){
+
+            document.querySelector('#Admin_ID').value = data.Admin_ID || '';
+            document.querySelector('#username').value = data.username || '';
+            document.querySelector('#password').value = data.password;
+            document.querySelector('#firstName').value = data.first_name || '';
+            document.querySelector('#lastName').value = data.last_name || '';
+
+            $('#editProfileModal').modal('show');
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+    const edit = document.querySelector(`#saveProfileBtn`);
+
+    if(edit){
+
+        edit.onclick = async (e) => {
+
+            e.preventDefault();
+            const passwordField = document.querySelector('#password');
+            const newData = {
+
+                username: document.querySelector('#username').value,
+                first_name: document.querySelector('#firstName').value,
+                last_name: document.querySelector('#lastName').value,
+                Admin_ID: document.querySelector(`#Admin_ID`).value
+
+            };
+
+            if (passwordField.value.trim() !== '') {
+                newData.password = passwordField.value;
+            }
+
+            try{
+
+                const updateResponse = await fetch(`http://localhost:3000/admin/update-info`, {
+
+                    method: 'PUT',
+                    headers: {
+
+                        'Authorization' : token,
+                        'Content-Type': 'application/json'
+
+                    },
+                    body: JSON.stringify(newData)
+
+                });
+
+                const result = await updateResponse.json();
+
+                if(updateResponse.ok){
+
+                    alert(`Successfully Updated Admin Info`);
+                    location.reload();
+
+                }else{
+
+                    console.log(result.error);
+                    alert(`Error Updating user: ${result.error}`);
+
+                }
+
+            }catch(error){
+
+                console.log(error);
+
+            }
+
+        }
+
+    }
+
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const editProfileModal = document.getElementById('editProfileModal');
+    
+    // Clean up modal backdrop when modal is hidden
+    $(editProfileModal).on('hidden.bs.modal', function () {
+        $('body').removeClass('modal-open');
+        $('.modal-backdrop').remove();
+    });
+});
