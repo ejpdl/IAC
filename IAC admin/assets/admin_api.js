@@ -31,8 +31,8 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    // database: "internet_access_center"
-    database: "iac"
+    database: "internet_access_center"
+    // database: "iac"
 
 });
 
@@ -201,7 +201,10 @@ app.post(`/login/admin`, async (req, res) => {
 
                 const token = jwt.sign(
 
-                    { username: user.username },
+                    { 
+                        username: user.username, 
+                        Admin_ID: user.Admin_ID 
+                    },
                     secret,
                     { expiresIn: "2h" }
 
@@ -211,6 +214,7 @@ app.post(`/login/admin`, async (req, res) => {
 
                     msg: `Log In Successful`,
                     token: token,
+                    Admin_ID: user.Admin_ID,
                     redirectUrl: `../dashboard.html`
 
                 });
@@ -953,6 +957,78 @@ app.get('/api/department-usage', (req, res) => {
 });
 
 
+
+// VIEW ADMIN
+app.get(`/admin/view/:Admin_ID`, verifyToken, async (req, res) => {
+
+    const { Admin_ID } = req.params;
+
+    try{
+
+        const query = `SELECT Admin_ID, username, first_name, last_name FROM admin WHERE Admin_ID = ?`;
+
+        connection.query(query, [Admin_ID], (err, rows) => {
+
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            if(rows.length === 0){
+
+                return res.status(404).json({ error: `User not found` });
+
+            }
+
+            res.status(200).json(rows[0]);
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
+
+
+// EDIT ADMIN
+app.put(`/admin/update-info`, verifyToken, async (req, res) => {
+
+    const { username, password, first_name, last_name, Admin_ID } = req.body;
+    try {
+        let query;
+        let params;
+
+        if (password) {
+            // If password is provided, hash it and update all fields
+            const hashedPassword = await bcrypt.hash(password, 10);
+            query = `UPDATE admin SET username = ?, password = ?, first_name = ?, last_name = ? WHERE Admin_ID = ?`;
+            params = [username, hashedPassword, first_name, last_name, Admin_ID];
+        } else {
+            // If no password provided, update everything except password
+            query = `UPDATE admin SET username = ?, first_name = ?, last_name = ? WHERE Admin_ID = ?`;
+            params = [username, first_name, last_name, Admin_ID];
+        }
+
+        connection.query(query, params, (err, results) => {
+            if(err) {
+                return res.status(500).json({ error: err.message });
+            }
+            if(results.affectedRows === 0) {
+                return res.status(404).json({ error: `No record found` });
+            }
+            console.log(`Successfully updated`);
+            res.status(200).json({ msg: `Successfully Updated!` });
+        });
+    } catch(error) {
+        console.log(error);
+        res.status(500).json({ error: 'Server error' });
+    }
+
+});
 
 const PORT = process.env.PORT || 3000;
 
