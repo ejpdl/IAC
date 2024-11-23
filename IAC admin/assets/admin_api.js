@@ -232,6 +232,7 @@ app.post(`/login/admin`, async (req, res) => {
 });
 
 
+
 // VIEW INFORMATION OF ADMIN
 app.get(`/admin/details`, verifyToken, async (req, res) => {
 
@@ -898,56 +899,59 @@ app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
 
 });
 
-// Endpoint to get year-level usage data for a specific month
-app.get('/api/year-level-usage/:month', (req, res) => {
-    const { month } = req.params;
-
+// Backend Express Route
+app.get('/api/year-level-usage/:month/:year', (req, res) => {
+    const { month, year } = req.params;
+  
     const query = `
       SELECT s.year_level, COUNT(sh.session_id) AS usage_count
       FROM session_history sh
       JOIN students s ON sh.Student_ID = s.Student_ID
-      WHERE MONTH(sh.date_used) = ?
+      WHERE MONTH(sh.date_used) = ? 
+      AND YEAR(sh.date_used) = ?
       GROUP BY s.year_level
       ORDER BY s.year_level ASC
     `;
-
-    connection.query(query, [month], (err, results) => {  // Use 'connection' instead of 'db'
-        if (err) {
-            console.error('Error executing query:', err);
-            res.status(500).json({ error: 'Internal server error' });
-        } else {
-            res.json(results);
-        }
+  
+    connection.query(query, [month, year], (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'Internal server error' });
+      } else {
+        res.json(results);
+      }
     });
-});
-
-// Department usage API
+  });
+// Backend - Updated API endpoint
 app.get('/api/department-usage', (req, res) => {
-    const month = req.query.month; // Get selected month from query params
+    const month = req.query.month;
+    const year = req.query.year;  // Add year parameter
 
     const query = `
     SELECT s.course, COUNT(sh.session_id) AS usage_count
     FROM session_history sh
     JOIN students s ON sh.Student_ID = s.Student_ID
     WHERE MONTH(sh.date_used) = ? 
+    AND YEAR(sh.date_used) = ?
     GROUP BY s.course
     ORDER BY usage_count DESC;
     `;
 
-    connection.query(query, [month], (err, results) => {
+    connection.query(query, [month, year], (err, results) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error', error: err });
         }
 
         const departmentUsageData = results.map(result => ({
-            department: result.course, // Department name (course)
-            usageCount: result.usage_count, // Usage count for that department
+            department: result.course,
+            usageCount: result.usage_count,
         }));
 
-        res.json(departmentUsageData); // Send the data as JSON
+        res.json(departmentUsageData);
     });
 });
+
 
 
 const PORT = process.env.PORT || 3000;

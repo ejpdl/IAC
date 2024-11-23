@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Admin Dashboard</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
@@ -14,7 +14,6 @@
 </head>
 
 <style>
-
 
 </style>
 
@@ -146,8 +145,52 @@
             <!-- Year Level Usage Graph -->
             <div class="shape square2 bg-secondary me-3 d-flex flex-column align-items-center">
               <h1 class="text text-center mt-0">Year Level Usage Graph</h1>
-              <div class="mt-5">
-                <select class="form-select" id="yearLevelMonthDropdown" aria-label="Select Month">
+              <a href="report/year-level-usage-report.html" class="btn btn-danger print-button" target="_blank">
+                <i class="fas fa-file-alt"></i> Print Report
+              </a>
+              <div class="form-group d-flex align-items-center mt-5">
+                <!-- Month Selector -->
+                <div class="me-3">
+                  <select class="form-select" id="yearLevelMonthDropdown" aria-label="Select Month">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                </div>
+
+                <!-- Year Selector -->
+                <div>
+                  <select id="yearSelector" class="form-select">
+                    <script>
+                      const currentYear = new Date().getFullYear();
+                      for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+                        // Add 'selected' attribute for the current year
+                        const selected = (i === currentYear) ? 'selected' : '';
+                        document.write(`<option value="${i}" ${selected}>${i}</option>`);
+                      }
+                    </script>
+                  </select>
+                </div>
+              </div>
+              <canvas id="yearLevelChart" class="my-3"></canvas>
+            </div>
+
+            <div class="shape square2 bg-secondary">
+              <h1 class="text text-center mt-3">Department Usage Graph</h1>
+              <a href="report/year-level-report.html" class="btn btn-danger print-button" target="_blank">
+                <i class="fas fa-file-alt"></i> Print Report
+              </a>
+              <div class="d-flex align-items-center gap-2 mb-3">
+                <select class="form-select" id="courseUsageMonthDropdown" aria-label="Select Month" style="width: 150px;">
                   <option value="1">January</option>
                   <option value="2">February</option>
                   <option value="3">March</option>
@@ -161,26 +204,14 @@
                   <option value="11">November</option>
                   <option value="12">December</option>
                 </select>
-              </div>
-              <canvas id="yearLevelChart" class="my-3"></canvas>
-            </div>
-
-            <div class="shape square2 bg-secondary">
-              <h1 class="text text-center mt-3">Department Usage Graph</h1>
-              <div>
-                <select class="form-select" id="courseUsageMonthDropdown" aria-label="Select Month">
-                  <option value="1">January</option>
-                  <option value="2">February</option>
-                  <option value="3">March</option>
-                  <option value="4">April</option>
-                  <option value="5">May</option>
-                  <option value="6">June</option>
-                  <option value="7">July</option>
-                  <option value="8">August</option>
-                  <option value="9">September</option>
-                  <option value="10">October</option>
-                  <option value="11">November</option>
-                  <option value="12">December</option>
+                <select id="courseUsageYearDropdown" class="form-select">
+                  <script>
+                    const currentYears = new Date().getFullYear();
+                    for (let i = currentYears - 5; i <= currentYears + 5; i++) {
+                      const selected = (i === currentYears) ? 'selected' : '';
+                      document.write(`<option value="${i}" ${selected}>${i}</option>`);
+                    }
+                  </script>
                 </select>
               </div>
               <canvas id="departmentUsageChart" class="my-3" style="max-width: 60%; height: 300px;"></canvas>
@@ -301,10 +332,10 @@
     // Department Usage Pie Chart
     const deptCtx = document.getElementById('departmentUsageChart').getContext('2d');
 
-    // Fetch department usage data for the selected month
-    const fetchDepartmentUsageData = async (month) => {
+    // Fetch department usage data for the selected month and year
+    const fetchDepartmentUsageData = async (month, year) => {
       try {
-        const response = await fetch(`http://localhost:3000/api/department-usage?month=${month}`);
+        const response = await fetch(`http://localhost:3000/api/department-usage?month=${month}&year=${year}`);
         const data = await response.json();
 
         const departmentNames = data.map(item => item.department);
@@ -358,42 +389,55 @@
       });
     };
 
-    // Event listener for the month dropdown
-    const monthDropdown = document.getElementById('courseUsageMonthDropdown');
-    monthDropdown.addEventListener('change', (event) => {
-      const selectedMonth = event.target.value;
-      fetchDepartmentUsageData(selectedMonth);
-    });
-
-    // Set the dropdown to the current month on page load
+    // Event listeners for both month and year dropdowns
     document.addEventListener('DOMContentLoaded', () => {
-      const currentMonth = new Date().getMonth() + 1;
       const monthDropdown = document.getElementById('courseUsageMonthDropdown');
+      const yearDropdown = document.getElementById('courseUsageYearDropdown');
+
+      // Set initial values to current month and year
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
+
       monthDropdown.value = currentMonth;
+      yearDropdown.value = currentYear;
+
+      // Function to update chart when either dropdown changes
+      const updateChart = () => {
+        const selectedMonth = monthDropdown.value;
+        const selectedYear = yearDropdown.value;
+        fetchDepartmentUsageData(selectedMonth, selectedYear);
+      };
+
+      // Add event listeners
+      monthDropdown.addEventListener('change', updateChart);
+      yearDropdown.addEventListener('change', updateChart);
+
+      // Initial chart render
+      updateChart();
     });
-    // Initial chart rendering using the current month
-    fetchDepartmentUsageData(new Date().getMonth() + 1);
   </script>
 
   <script>
+    // Frontend JavaScript
     document.addEventListener('DOMContentLoaded', function () {
       // Create an empty chart initially
       const ctx = document.getElementById('yearLevelChart').getContext('2d');
       const yearLevelChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: [],  // Initial empty labels
+          labels: [],
           datasets: [{
             label: 'Usage Count',
-            data: [],  // Initial empty data
-            backgroundColor: ['#800000', '#b53030', '#e77272', '#eea6a6'], // Colors for each bar
+            data: [],
+            backgroundColor: ['#800000', '#b53030', '#e77272', '#eea6a6'],
           }]
         },
         options: {
           responsive: true,
           plugins: {
             legend: {
-              display: false  // Hide legend if not needed
+              display: false
             },
             tooltip: {
               enabled: true
@@ -438,17 +482,24 @@
         }
       });
 
-      // Get the month dropdown element
+      // Get the month and year dropdown elements
       const monthDropdown = document.getElementById('yearLevelMonthDropdown');
+      const yearSelector = document.getElementById('yearSelector');
 
-      // Set the dropdown to the current month
-      const currentMonth = new Date().getMonth() + 1;
+      // Set the dropdowns to current month and year
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth() + 1;
+      const currentYear = currentDate.getFullYear();
+
       monthDropdown.value = currentMonth;
-      // Function to fetch and update the chart data based on the selected month
-      monthDropdown.addEventListener('change', function () {
-        const selectedMonth = this.value;
+      yearSelector.value = currentYear;
 
-        fetch(`http://localhost:3000/api/year-level-usage/${selectedMonth}`)
+      // Function to fetch and update chart data
+      function updateChartData() {
+        const selectedMonth = monthDropdown.value;
+        const selectedYear = yearSelector.value;
+
+        fetch(`http://localhost:3000/api/year-level-usage/${selectedMonth}/${selectedYear}`)
           .then(response => response.json())
           .then(data => {
             const labels = data.map(item => item.year_level);
@@ -457,15 +508,18 @@
             // Update chart data
             yearLevelChart.data.labels = labels;
             yearLevelChart.data.datasets[0].data = usageCounts;
-            yearLevelChart.update();  // Refresh the chart with new data
+            yearLevelChart.update();
           })
           .catch(error => console.error('Error fetching data:', error));
-      });
+      }
 
-      // Trigger data fetch for the current month
-      monthDropdown.dispatchEvent(new Event('change'));
+      // Add event listeners to both dropdowns
+      monthDropdown.addEventListener('change', updateChartData);
+      yearSelector.addEventListener('change', updateChartData);
+
+      // Initial data fetch
+      updateChartData();
     });
-
   </script>
 
 </body>
