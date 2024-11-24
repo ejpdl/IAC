@@ -192,111 +192,88 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // EDIT ADMIN
-async function EditAdmin(Admin_ID){
-
+async function EditAdmin(Admin_ID) {
     const token = localStorage.getItem('token');
 
-    if(!token){
-
+    if(!token) {
         console.log(`No token found. Please Log in again`);
         return;
-
     }
 
-    try{
-
+    try {
         const response = await fetch(`http://localhost:3000/admin/view/${Admin_ID}`, {
-
             method: 'GET',
             headers: {
-
-                'Authorization' :  token,
+                'Authorization': token,
                 'Content-Type': 'application/json'
-
             }
-
         });
 
         const data = await response.json();
 
-        if(data){
-
+        if(data) {
             document.querySelector('#Admin_ID').value = data.Admin_ID || '';
             document.querySelector('#username').value = data.username || '';
-            document.querySelector('#password').value = data.password;
+            // Remove this line since we don't want to show the password
+            // document.querySelector('#password').value = data.password;
             document.querySelector('#firstName').value = data.first_name || '';
             document.querySelector('#lastName').value = data.last_name || '';
+            
+            // Clear the password field
+            document.querySelector('#password').value = '';
+            // Add a placeholder to indicate this is for a new password
+            document.querySelector('#password').placeholder = 'Enter new password (leave blank to keep current)';
 
             $('#editProfileModal').modal('show');
-
         }
 
-    }catch(error){
-
+    } catch(error) {
         console.log(error);
-
     }
 
     const edit = document.querySelector(`#saveProfileBtn`);
 
-    if(edit){
-
+    if(edit) {
         edit.onclick = async (e) => {
-
             e.preventDefault();
             const passwordField = document.querySelector('#password');
             const newData = {
-
                 username: document.querySelector('#username').value,
                 first_name: document.querySelector('#firstName').value,
                 last_name: document.querySelector('#lastName').value,
                 Admin_ID: document.querySelector(`#Admin_ID`).value
-
             };
 
+            // Only include password if the user entered a new one
             if (passwordField.value.trim() !== '') {
                 newData.password = passwordField.value;
             }
 
-            try{
-
+            try {
                 const updateResponse = await fetch(`http://localhost:3000/admin/update-info`, {
-
                     method: 'PUT',
                     headers: {
-
-                        'Authorization' : token,
+                        'Authorization': token,
                         'Content-Type': 'application/json'
-
                     },
                     body: JSON.stringify(newData)
-
                 });
 
                 const result = await updateResponse.json();
 
-                if(updateResponse.ok){
-
+                if(updateResponse.ok) {
                     alert(`Successfully Updated Admin Info`);
                     location.reload();
-
-                }else{
-
+                } else {
                     console.log(result.error);
                     alert(`Error Updating user: ${result.error}`);
-
                 }
 
-            }catch(error){
-
+            } catch(error) {
                 console.log(error);
-
             }
-
         }
-
     }
-
 }
 
 document.addEventListener('DOMContentLoaded', function() {
