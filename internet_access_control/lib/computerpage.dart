@@ -37,7 +37,7 @@ class _ComputerPageState extends State<ComputerPage> {
       }
 
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:4000/PC_List/view_all'),
+        Uri.parse('http://localhost:4000/PC_List/view_all'),
       );
 
       if (response.statusCode == 200) {
@@ -59,7 +59,7 @@ class _ComputerPageState extends State<ComputerPage> {
   Future<void> _fetchComputerStatus() async {
     try {
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:4000/PC_List/view_all'),
+        Uri.parse('http://localhost:4000/PC_List/view_all'),
       );
 
       if (response.statusCode == 200) {
@@ -173,7 +173,7 @@ class _ComputerPageState extends State<ComputerPage> {
       case 'available':
         return Colors.green;
       case 'occupied':
-        return Color.fromARGB(255, 128, 0, 0);
+        return const Color.fromARGB(255, 128, 0, 0);
       case 'pending':
         return Colors.orange;
       default:
@@ -195,7 +195,7 @@ class _ComputerPageState extends State<ComputerPage> {
       }
 
       final response = await http.post(
-        Uri.parse('http://127.0.0.1:4000/api/request-pc'),
+        Uri.parse('http://localhost:4000/api/request-pc'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -275,12 +275,15 @@ class _ComputerPageState extends State<ComputerPage> {
                   : Padding(
                       padding: const EdgeInsets.all(20.0),
                       child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: MediaQuery.of(context).size.width ~/
+                              120, // Dynamically calculate the number of columns
                           mainAxisSpacing: 20,
                           crossAxisSpacing: 20,
-                          childAspectRatio: 1,
+                          childAspectRatio:
+                              MediaQuery.of(context).size.aspectRatio > 1
+                                  ? 1
+                                  : 0.75, // Adjust based on screen orientation
                         ),
                         itemCount: computerStatus.length,
                         itemBuilder: (context, index) {
@@ -333,7 +336,7 @@ class _ComputerPageState extends State<ComputerPage> {
             size: 50,
             color: Colors.grey,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 3),
           Text(
             pc,
             style: const TextStyle(
@@ -341,7 +344,7 @@ class _ComputerPageState extends State<ComputerPage> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -373,8 +376,8 @@ class _ComputerPageState extends State<ComputerPage> {
 
     if (status.toLowerCase() == 'occupied') {
       try {
-        final response = await http
-            .get(Uri.parse('http://127.0.0.1:4000/api/pc-time/$pc'));
+        final response =
+            await http.get(Uri.parse('http://localhost:4000/api/pc-time/$pc'));
 
         if (response.statusCode == 200) {
           final Map<String, dynamic> pcData = jsonDecode(response.body);

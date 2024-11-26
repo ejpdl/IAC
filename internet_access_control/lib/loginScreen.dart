@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      var url = "http://127.0.0.1:4000/userdata/login";
+      var url = "http://localhost:4000/userdata/login";
 
       final response = await http.post(
         Uri.parse(url),
@@ -94,12 +94,13 @@ class _LoginScreenState extends State<LoginScreen> {
               ]),
             ),
             child: const Padding(
-              padding: EdgeInsets.only(top: 60.0, left: 22),
+              padding: EdgeInsets.only(top: 60.0),
               child: Text(
-                'Hello \n  Log in!',
+                'Internet Access\n'
+                'Center',
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontFamily: 'NotoSerif',
-                  fontSize: 40,
+                  fontSize: 35,
                   color: Color.fromARGB(255, 128, 0, 0),
                   fontWeight: FontWeight.bold,
                 ),

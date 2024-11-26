@@ -8,104 +8,115 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
-  bool _isLogoCentered = false;
-  bool _isTextCentered = false;
-  double _opacity = 1.0; // For fading out the entire splash screen
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _logoAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    _fadeController = AnimationController(
+    // Initialize AnimationController with 6 seconds duration
+    _controller = AnimationController(
+      duration: const Duration(seconds: 6),
       vsync: this,
-      duration: Duration(seconds: 1),
-    );
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeIn,
     );
 
-    // Step 1: Move elements to the center
-    Timer(Duration(seconds: 1), () {
-      setState(() {
-        _isLogoCentered = true;
-        _isTextCentered = true;
+    // Create the bounce effect using TweenSequence
+    _logoAnimation = TweenSequence([
+      // Start from above the screen (-1.0) and drop to the center (0.0)
+      TweenSequenceItem(
+        tween: Tween<double>(begin: -1.0, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 25,
+      ),
+      // First bounce up and down
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: 0.4)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 15,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.4, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 10,
+      ),
+      // Second smaller bounce
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: 0.2)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 10,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.2, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 5,
+      ),
+      // Final small bounce
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: 0.1)
+            .chain(CurveTween(curve: Curves.easeOut)),
+        weight: 5,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.1, end: 0.0)
+            .chain(CurveTween(curve: Curves.easeInOut)),
+        weight: 5,
+      ),
+    ]).animate(_controller)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // Pause at the center for 3 seconds
+          Timer(const Duration(seconds: 1), () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+            );
+          });
+        }
       });
-      _fadeController.forward();
-    });
 
-    // Step 2: Wait 2 seconds after centering, then fade out
-    Timer(Duration(seconds: 5), () {
-      // 1 second for centering + 3 seconds of stay
-      setState(() {
-        _opacity = 0.0; // Start fading out
-      });
-      // Step 3: Navigate to WelcomeScreen after fade-out
-      Timer(Duration(seconds: 1), () {
-        // Wait for fade-out to complete
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => WelcomeScreen()),
-        );
-      });
-    });
+    // Start the animation
+    _controller.forward();
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 244, 241),
-      body: AnimatedOpacity(
-        duration: Duration(seconds: 1), // Duration of the fade-out
-        opacity: _opacity,
-        child: Stack(
-          children: [
-            AnimatedPositioned(
-              duration: const Duration(seconds: 3), // Duration for centering
-              curve: Curves.easeOut,
-              top: _isLogoCentered
-                  ? MediaQuery.of(context).size.height * 0.26
-                  : 0,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/top_logo.jpg',
-                  width: 300,
-                  height: 300,
-                ),
-              ),
-            ),
-            AnimatedPositioned(
-              duration: const Duration(seconds: 3), // Duration for centering
-              curve: Curves.easeOut,
-              bottom: _isTextCentered
-                  ? MediaQuery.of(context).size.height * 0.26
-                  : 0,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
+      backgroundColor: const Color.fromARGB(255, 255, 244, 241),
+      body: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          // Adjust position for falling and bouncing in the center
+          double topPosition =
+              (screenHeight * 0.3) * (1 + _logoAnimation.value);
+
+          return Stack(
+            children: [
+              Positioned(
+                top: topPosition,
+                left: 0,
+                right: 0,
+                child: Center(
                   child: Image.asset(
-                    'assets/images/bottom_logo.jpg',
-                    width: 300,
-                    height: 300,
+                    'assets/images/iac_logo_b.jpg',
+                    width: screenWidth * 0.6,
+                    height: screenWidth * 0.6,
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
+            ],
+          );
+        },
       ),
     );
   }

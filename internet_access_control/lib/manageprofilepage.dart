@@ -75,7 +75,7 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
 
     try {
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:4000/api/student/$studentId'),
+        Uri.parse('http://localhost:4000/api/student/$studentId'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -127,7 +127,7 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
 
     try {
       final response = await http.put(
-        Uri.parse('http://127.0.0.1:4000/api/studprofile/$studentId'),
+        Uri.parse('http://localhost:4000/api/studprofile/$studentId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(updatedData),
       );

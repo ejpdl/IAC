@@ -44,7 +44,7 @@ class _HistoryPageState extends State<HistoryPage> {
       }
 
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:4000/api/session-history/$studentId'),
+        Uri.parse('http://localhost:4000/api/session-history/$studentId'),
       );
 
       if (response.statusCode == 200) {
