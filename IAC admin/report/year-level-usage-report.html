@@ -14,11 +14,12 @@
       padding: 20px;
       background-color: white;
     }
-    
+
     @media print {
       .month-selection {
         display: none;
       }
+
       .chart-container {
         break-inside: avoid;
       }
@@ -130,7 +131,7 @@
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return date.toLocaleDateString('en-US', options);
     }
-    
+
     const today = new Date();
     document.getElementById('currentDate').textContent = formatDate(today);
     document.getElementById('currentDate2').textContent = formatDate(today);
@@ -208,9 +209,9 @@
     function updateData() {
       const month = document.getElementById('monthSelector').value;
       const year = document.getElementById('yearSelector').value;
-      
+
       // Replace this URL with your actual API endpoint
-      fetch(`http://localhost:3000/api/year-level-usage/${month}/${year}`)
+      fetch(`https://iac-api-admin.onrender.com/api/year-level-usage/${month}/${year}`)
         .then(response => response.json())
         .then(data => {
           // Update table
@@ -236,7 +237,7 @@
     }
 
     // Initialize everything when the document is loaded
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       // Set current month and year in selectors
       const currentMonth = today.getMonth() + 1;
       document.getElementById('monthSelector').value = currentMonth;
@@ -254,4 +255,5 @@
     });
   </script>
 </body>
+
 </html>

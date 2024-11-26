@@ -18,14 +18,14 @@ login.addEventListener('submit', async (event) => {
 
     }
 
-    try{
+    try {
 
-        const response = await fetch(`http://localhost:3000/login/admin`, {
+        const response = await fetch(`https://iac-api-admin.onrender.com/login/admin`, {
 
             method: 'POST',
             headers: {
 
-                'Content-Type'  :   'application/json'
+                'Content-Type': 'application/json'
 
             },
             body: JSON.stringify(data)
@@ -34,21 +34,21 @@ login.addEventListener('submit', async (event) => {
 
         const result = await response.json();
 
-        if(response.ok){
+        if (response.ok) {
 
             localStorage.setItem('token', result.token);
             const tokenPayload = JSON.parse(atob(result.token.split('.')[1]));
             localStorage.setItem('adminId', tokenPayload.Admin_ID);
             window.location.href = result.redirectUrl,
-            alert(`Welcome, ${username}`);
+                alert(`Welcome, ${username}`);
 
-        }else{
+        } else {
 
             alert(`Incorrect Password or Username`);
 
         }
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
         alert(`Incorrect Password or Username`);
