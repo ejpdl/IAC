@@ -12,7 +12,7 @@ async function loadData() {
 
   try {
 
-    const response = await fetch(`http://localhost:3000/admin/details`, {
+    const response = await fetch(`https://iac-admin-api.onrender.com/admin/details`, {
 
       method: 'GET',
       headers: {

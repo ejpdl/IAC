@@ -95,7 +95,7 @@
             <div class="shape rectangle bg-primary me-3 d-flex align-items-center">
               <!-- Icon or Image on the left -->
               <div class="rectangle-icon me-3">
-                <img src="assets/images/lebron.jpg" id="changeable-image" alt="Icon" class="icon-img">
+                <img src="assets/images/Profileplaceholder.png" id="changeable-image" alt="Icon" class="icon-img">
               </div>
               <div>
                 <h3>Welcome, <br><span id="fullname">Name</span></h3>
@@ -190,7 +190,8 @@
                 <i class="fas fa-file-alt"></i> Print Report
               </a>
               <div class="d-flex align-items-center gap-2 mb-3">
-                <select class="form-select" id="courseUsageMonthDropdown" aria-label="Select Month" style="width: 150px;">
+                <select class="form-select" id="courseUsageMonthDropdown" aria-label="Select Month"
+                  style="width: 150px;">
                   <option value="1">January</option>
                   <option value="2">February</option>
                   <option value="3">March</option>
@@ -222,52 +223,55 @@
     </div>
   </div>
 
-<!-- Edit Profile Modal -->
-<div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel" aria-hidden="true" data-backdrop="true">
-    
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1" role="dialog" aria-labelledby="editProfileModalLabel"
+    aria-hidden="true" data-backdrop="true">
+
     <div class="modal-dialog" role="document">
-        <div class="modal-content" style="background-color: white; color: maroon;">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true" style="color: maroon; font-size: 1.5rem;">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="editProfileForm">
-                    <input type="hidden" id="Admin_ID">
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter Username" readonly>
-                    </div>
-                    <div class="form-group">
-                      <label for="password">Password</label>
-                      <div class="input-group">
-                          <input type="password" class="form-control" id="password" placeholder="Enter New Password">
-                          
-                              <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                  <i class="fa fa-eye" aria-hidden="true"></i>
-                              </button>
-                          
-                      </div>
-                  </div>
-                    <div class="form-group">
-                        <label for="firstName">First Name</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="Enter First Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="Enter Last Name" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" style="background-color: #800000;" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-danger" style="background-color: #800000;" id="saveProfileBtn">Save Changes</button>
-            </div>
+      <div class="modal-content" style="background-color: white; color: maroon;">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true" style="color: maroon; font-size: 1.5rem;">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <form id="editProfileForm">
+            <input type="hidden" id="Admin_ID">
+            <div class="form-group">
+              <label for="username">Username</label>
+              <input type="text" class="form-control" id="username" placeholder="Enter Username" readonly>
+            </div>
+            <div class="form-group">
+              <label for="password">Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="password" placeholder="Enter New Password">
+
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                </button>
+
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" class="form-control" id="firstName" placeholder="Enter First Name" required>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" class="form-control" id="lastName" placeholder="Enter Last Name" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" style="background-color: #800000;"
+            data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-danger" style="background-color: #800000;" id="saveProfileBtn">Save
+            Changes</button>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
 
 
@@ -275,7 +279,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  <script src="assets/js/fetchs/dashboard_fetch.js"></script>
+  <script src="assets/js/dashboard_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -332,21 +336,21 @@
 
   <script>
 
-document.getElementById('togglePassword').addEventListener('click', function() {
-    const passwordInput = document.getElementById('password');
-    const icon = this.querySelector('i');
-    
-    // Toggle the password visibility
-    if (passwordInput.type === 'password') {
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('password');
+      const icon = this.querySelector('i');
+
+      // Toggle the password visibility
+      if (passwordInput.type === 'password') {
         passwordInput.type = 'text';
         icon.classList.remove('fa-eye');
         icon.classList.add('fa-eye-slash');
-    } else {
+      } else {
         passwordInput.type = 'password';
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
-    }
-});
+      }
+    });
 
     // Department Usage Pie Chart
     const deptCtx = document.getElementById('departmentUsageChart').getContext('2d');
@@ -354,7 +358,7 @@ document.getElementById('togglePassword').addEventListener('click', function() {
     // Fetch department usage data for the selected month and year
     const fetchDepartmentUsageData = async (month, year) => {
       try {
-        const response = await fetch(`http://localhost:3000/api/department-usage?month=${month}&year=${year}`);
+        const response = await fetch(`https://iac-admin-api.onrender.com/api/department-usage?month=${month}&year=${year}`);
         const data = await response.json();
 
         const departmentNames = data.map(item => item.department);
@@ -518,7 +522,7 @@ document.getElementById('togglePassword').addEventListener('click', function() {
         const selectedMonth = monthDropdown.value;
         const selectedYear = yearSelector.value;
 
-        fetch(`http://localhost:3000/api/year-level-usage/${selectedMonth}/${selectedYear}`)
+        fetch(`https://iac-admin-api.onrender.com/api/year-level-usage/${selectedMonth}/${selectedYear}`)
           .then(response => response.json())
           .then(data => {
             const labels = data.map(item => item.year_level);

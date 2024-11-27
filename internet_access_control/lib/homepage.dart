@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       final response = await http.get(
-        Uri.parse('http://127.0.0.1:4000/userdata/student/$studentId'),
+        Uri.parse('https://flutterapi-q64f.onrender.com/userdata/student/$studentId'),
       );
 
       if (response.statusCode == 200) {
@@ -208,8 +208,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                     const SizedBox(height: 20),
                     const Text(
-                      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quam velit, '
-                      'vulputate eu pharetra nec, mattis ac neque.',
+                      'The Internet Access Control (IAC) Center is a dedicated'
+                      'facility within the university designed to provide students '
+                      'with reliable access to computers and internet resources.'
+                      'It serves as a central hub for academic and research activities,'
+                      'offering a well-equipped environment to support learning,'
+                      'digital literacy, and technical skill development.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,

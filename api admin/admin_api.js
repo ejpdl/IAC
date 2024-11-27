@@ -26,28 +26,16 @@ const logger = (req, res, next) => {
 
 app.use(logger);
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
 
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "internet_access_center"
-    // database: "iac"
-
-});
-
-connection.connect((err) => {
-
-    if (err) {
-
-        console.log(`Error connecting to the database: ${err}`);
-        return;
-
-    } else {
-
-        console.log(`Successfully connected to the database: ${connection.config.database}`);
-
-    }
+    host: "srv545.hstgr.io",
+    user: "u579076463_iacmonitoring",
+    password: "Iacmonitoring@2024",
+    // database: "internet_access_center"
+    database: "u579076463_iacmonitoring",
+    waitForConnections: true,
+    connectionLimit: 10,
+    multipleStatements: true
 
 });
 
@@ -201,9 +189,9 @@ app.post(`/login/admin`, async (req, res) => {
 
                 const token = jwt.sign(
 
-                    { 
-                        username: user.username, 
-                        Admin_ID: user.Admin_ID 
+                    {
+                        username: user.username,
+                        Admin_ID: user.Admin_ID
                     },
                     secret,
                     { expiresIn: "2h" }
@@ -415,12 +403,15 @@ app.get('/api/pc-status', (req, res) => {
 app.post('/api/request-response', (req, res) => {
     const { pcId, action } = req.body;
 
+    if (!pcId || typeof pcId !== 'string') {
+        return res.status(400).json({ error: 'Invalid or missing PC ID' });
+    }
+
     if (action !== 'accept' && action !== 'decline') {
         return res.status(400).json({ error: 'Invalid action' });
     }
 
-    // First, get the student ID for the PC request
-    connection.query('SELECT Student_ID FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
+    connection.query('SELECT Student_ID, pc_status FROM pc_list WHERE PC_ID = ?', [pcId], (error, results) => {
         if (error) {
             console.error('Error fetching PC details:', error);
             return res.status(500).json({ error: 'Internal server error' });
@@ -430,58 +421,47 @@ app.post('/api/request-response', (req, res) => {
             return res.status(404).json({ error: 'PC not found' });
         }
 
-        const studentId = results[0].Student_ID;
+        const pc = results[0];
 
-        // If declining, no need to check other PCs
-        if (action === 'decline') {
-            updatePCStatus('Available', null, pcId, res);
-            return;
+        if (pc.pc_status !== 'Pending') {
+            return res.status(400).json({ error: 'PC is not in pending status' });
         }
 
-        // If accepting, check if student is already using another PC
-        const checkOtherPCsQuery = `
-      SELECT PC_ID FROM pc_list 
-      WHERE Student_ID = ? 
-      AND PC_ID != ? 
-      AND pc_status = 'Occupied'
+        if (action === 'decline') {
+            return updatePCStatus('Available', null, pcId, res);
+        }
+
+        const currentTime = moment().tz('Asia/Manila');
+        const timeUsed = currentTime.format('HH:mm:ss');
+        // Change to add 1 hour instead of 8
+        const endTime = currentTime.add(1, 'hour').format('HH:mm:ss');
+
+        const updateQuery = `
+      UPDATE pc_list 
+      SET pc_status = 'Occupied', 
+          time_used = ?, 
+          end_time = ?
+      WHERE PC_ID = ?
     `;
 
-        connection.query(checkOtherPCsQuery, [studentId, pcId], (error, results) => {
+        connection.query(updateQuery, [timeUsed, endTime, pcId], (error) => {
             if (error) {
-                console.error('Error checking other PCs:', error);
+                console.error('Error updating request:', error);
                 return res.status(500).json({ error: 'Internal server error' });
             }
 
-            if (results.length > 0) {
-                return res.status(400).json({
-                    error: `Student is already using PC ${results[0].PC_ID}`
-                });
-            }
-
-            // If all checks pass, update the PC status
-            const newStatus = 'Occupied';
-            const currentTime = new Date();
-            const endTime = new Date(currentTime.getTime() + 60 * 60 * 1000); // 1 hour
-
-            const updateQuery = `
-        UPDATE pc_list 
-        SET pc_status = ?,
-            time_used = CURRENT_TIME(),
-            end_time = ?
-        WHERE PC_ID = ?
-      `;
-
-            connection.query(updateQuery, [newStatus, endTime, pcId], (error) => {
-                if (error) {
-                    console.error('Error updating request:', error);
-                    return res.status(500).json({ error: 'Internal server error' });
-                }
-
-                res.json({ message: 'Request accepted successfully' });
+            res.json({
+                message: 'Request accepted successfully',
+                pcId: pcId,
+                status: 'Occupied',
+                timeUsed: timeUsed,
+                endTime: endTime,
+                serverTime: currentTime.format()
             });
         });
     });
 });
+
 
 // Helper function to update PC status
 function updatePCStatus(status, studentId, pcId, res) {
@@ -906,7 +886,7 @@ app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
 // Backend Express Route
 app.get('/api/year-level-usage/:month/:year', (req, res) => {
     const { month, year } = req.params;
-  
+
     const query = `
       SELECT s.year_level, COUNT(sh.session_id) AS usage_count
       FROM session_history sh
@@ -916,16 +896,16 @@ app.get('/api/year-level-usage/:month/:year', (req, res) => {
       GROUP BY s.year_level
       ORDER BY s.year_level ASC
     `;
-  
+
     connection.query(query, [month, year], (err, results) => {
-      if (err) {
-        console.error('Error executing query:', err);
-        res.status(500).json({ error: 'Internal server error' });
-      } else {
-        res.json(results);
-      }
+        if (err) {
+            console.error('Error executing query:', err);
+            res.status(500).json({ error: 'Internal server error' });
+        } else {
+            res.json(results);
+        }
     });
-  });
+});
 // Backend - Updated API endpoint
 app.get('/api/department-usage', (req, res) => {
     const month = req.query.month;
@@ -963,19 +943,19 @@ app.get(`/admin/view/:Admin_ID`, verifyToken, async (req, res) => {
 
     const { Admin_ID } = req.params;
 
-    try{
+    try {
 
         const query = `SELECT Admin_ID, username, first_name, last_name FROM admin WHERE Admin_ID = ?`;
 
         connection.query(query, [Admin_ID], (err, rows) => {
 
-            if(err){
+            if (err) {
 
                 return res.status(500).json({ error: err.message });
 
             }
 
-            if(rows.length === 0){
+            if (rows.length === 0) {
 
                 return res.status(404).json({ error: `User not found` });
 
@@ -985,7 +965,7 @@ app.get(`/admin/view/:Admin_ID`, verifyToken, async (req, res) => {
 
         });
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
 
@@ -1014,16 +994,16 @@ app.put(`/admin/update-info`, verifyToken, async (req, res) => {
         }
 
         connection.query(query, params, (err, results) => {
-            if(err) {
+            if (err) {
                 return res.status(500).json({ error: err.message });
             }
-            if(results.affectedRows === 0) {
+            if (results.affectedRows === 0) {
                 return res.status(404).json({ error: `No record found` });
             }
             console.log(`Successfully updated`);
             res.status(200).json({ msg: `Successfully Updated!` });
         });
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Server error' });
     }
@@ -1034,6 +1014,6 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
 
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running at PORT ${PORT}`);
 
-});
+})

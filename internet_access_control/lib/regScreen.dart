@@ -81,7 +81,7 @@ class _RegScreenState extends State<RegScreen> {
     });
 
     try {
-      var url = "http://127.0.0.1:4000/userdata/register";
+      var url = "https://flutterapi-q64f.onrender.com/userdata/register";
 
       final response = await http.post(
         Uri.parse(url),

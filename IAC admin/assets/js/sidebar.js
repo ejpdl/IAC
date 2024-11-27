@@ -1,11 +1,11 @@
-document.addEventListener('DOMContentLoaded', function() {
-    
+document.addEventListener('DOMContentLoaded', function () {
+
 
     // Initialize Bootstrap's collapse functionality for multiple submenus
     var submenuLinks = document.querySelectorAll('a[data-bs-toggle="collapse"]');
 
-    submenuLinks.forEach(function(link) {
-        link.addEventListener('click', function(e) {
+    submenuLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
             var targetId = this.getAttribute('data-bs-target');
             var targetCollapse = new bootstrap.Collapse(document.getElementById(targetId), {
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             // Close all other submenus
-            submenuLinks.forEach(function(otherLink) {
+            submenuLinks.forEach(function (otherLink) {
                 if (otherLink !== link) {
                     var otherTargetId = otherLink.getAttribute('data-bs-target');
                     var otherCollapse = bootstrap.Collapse.getInstance(document.getElementById(otherTargetId));
@@ -32,5 +32,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    
+
 });

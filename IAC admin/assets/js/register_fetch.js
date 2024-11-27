@@ -12,7 +12,7 @@ register.addEventListener('submit', async (event) => {
     const lastname = formData.get('lastname');
     const confirmPassword = document.querySelector(`#confirmPassword`).value;
 
-    if(password !== confirmPassword){
+    if (password !== confirmPassword) {
 
         alert(`Password do not match`);
         return;
@@ -28,14 +28,14 @@ register.addEventListener('submit', async (event) => {
 
     }
 
-    try{
+    try {
 
-        const response = await fetch(`http://localhost:3000/register/admin`, {
+        const response = await fetch(`https://iac-admin-api.onrender.com/register/admin`, {
 
             method: 'POST',
             headers: {
 
-                'Content-Type'  :   'application/json'
+                'Content-Type': 'application/json'
 
             },
             body: JSON.stringify(data)
@@ -44,19 +44,19 @@ register.addEventListener('submit', async (event) => {
 
         const result = await response.json();
 
-        if(response.ok){
+        if (response.ok) {
 
             localStorage.setItem('token', result.token);
             location.reload();
             alert(`Successfully registered`);
 
-        }else{
+        } else {
 
             alert(result.message || `Something went wrong`);
 
         }
 
-    }catch(error){
+    } catch (error) {
 
         console.log(error);
         alert(`The Server could be off or down`);

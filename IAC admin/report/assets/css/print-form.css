@@ -1,14 +1,15 @@
 @page {
-    size: legal; 
-    margin: 10px; 
+    size: legal;
+    margin: 10px;
 }
+
 body {
     font-family: Arial, sans-serif;
     font-size: 12px;
     line-height: 1.2;
     margin: 2rem 0;
     padding: 0;
-    background-color:#ddd;
+    background-color: #ddd;
 }
 
 .form-container {
@@ -26,11 +27,14 @@ table {
     margin-bottom: 10px;
 }
 
-table, th, td {
+table,
+th,
+td {
     border: 1px solid black;
 }
 
-th, td {
+th,
+td {
     padding: 3px;
     text-align: left;
     vertical-align: top;
@@ -64,79 +68,80 @@ th, td {
 
 
 .month-selection {
-width: 100%;
-max-width: 21cm;
-margin: 0 auto;
-background-color: #fff;
-margin-bottom: 1rem;
-border-radius: 10px;
-text-align: center; 
-display: flex;
-align-items: center;
-gap: 10px;
+    width: 100%;
+    max-width: 21cm;
+    margin: 0 auto;
+    background-color: #fff;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 
 
 .month-selection select {
-font-size: 13px;
-padding: 6px 10px;
-width: 150px;
-padding-left: 20px;
-outline: none;
-background: #FFFFFF;
-color: #E62626;
-border: 0px solid #000000;
-border-radius: 5px;
-box-shadow: 2px 1px 2px 1px #E2E2E2;
-transition: .3s ease;
+    font-size: 13px;
+    padding: 6px 10px;
+    width: 150px;
+    padding-left: 20px;
+    outline: none;
+    background: #FFFFFF;
+    color: #E62626;
+    border: 0px solid #000000;
+    border-radius: 5px;
+    box-shadow: 2px 1px 2px 1px #E2E2E2;
+    transition: .3s ease;
 }
 
 
 .month-selection select:focus {
-background: #F2F2F2;
-border: 1px solid #FFC900;
-border-radius: 10px;
+    background: #F2F2F2;
+    border: 1px solid #FFC900;
+    border-radius: 10px;
 }
 
 
 .month-selection select::placeholder {
-color: #DDDDDD;
+    color: #DDDDDD;
 }
 
-.month-selection{
-justify-content: center;
-margin-bottom: 20px;
+.month-selection {
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 .month-selection form {
-display: flex;
-gap: 10px;
+    display: flex;
+    gap: 10px;
 }
 
 /* Filter Button Styles */
 .print-button {
-background-color: #A2100E;
-color: #fff;
-text-decoration: none;
-padding: 8px 15px;
-margin: 20px 0;
+    background-color: #A2100E;
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 15px;
+    margin: 20px 0;
 
-border: none;
-border-radius: 5px;
-cursor: pointer;
-font-size: 13px;
-transition: background-color 0.3s ease;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.3s ease;
 }
 
 .print-button :hover {
-background-color: #7c100e;
+    background-color: #7c100e;
 }
 
 @media print {
-     .print-button, .month-selection label,
-.month-selection select
-{
+
+    .print-button,
+    .month-selection label,
+    .month-selection select {
         display: none;
     }
 
@@ -157,8 +162,9 @@ background-color: #7c100e;
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-  .month-selection select {
+}
+
+.month-selection select {
     font-size: 13px;
     width: 150px;
     padding-left: 10px;
@@ -169,22 +175,24 @@ background-color: #7c100e;
     border-radius: 5px;
     box-shadow: 2px 1px 2px 1px #E2E2E2;
     transition: .3s ease;
-  }
-  .month-selection select:focus {
+}
+
+.month-selection select:focus {
     background: #F2F2F2;
     border: 1px solid #FFC900;
     border-radius: 10px;
-  }
-  .month-selection select::placeholder {
+}
+
+.month-selection select::placeholder {
     color: #DDDDDD;
-  }
-  .month-selection {
+}
+
+.month-selection {
     justify-content: center;
     margin-bottom: 20px;
-  }
-  .month-selection form {
+}
+
+.month-selection form {
     display: flex;
     gap: 10px;
-  }
-
-
+}

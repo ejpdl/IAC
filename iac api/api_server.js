@@ -26,35 +26,16 @@ const logger = (req, res, next) => {
 
 app.use(logger);
 
-// const connection = mysql.createConnection({
+const connection = mysql.createPool({
 
-//     host: "byg2lehiaall3bovpkv6-mysql.services.clever-cloud.com",
-//     user: "uduuh17lwy9qe1fl",
-//     password: "UQddsqwfmrsd9vKyIN7u",
-//     database: "byg2lehiaall3bovpkv6"
-
-// });
-
-const connection = mysql.createConnection({
-
-    host: "localhost",
-    user: "root",
-    password: "",
+    host: "srv545.hstgr.io",
+    user: "u579076463_iacmonitoring",
+    password: "Iacmonitoring@2024",
     // database: "internet_access_center"
-    database: "iac"
-
-});
-
-connection.connect((err) => {
-
-    if (err) {
-
-        console.log(`Error connecting to the database: ${err}`);
-        return;
-
-    }
-
-    console.log(`Successfully connected to Internet Access Center Database`);
+    database: "u579076463_iacmonitoring",
+    waitForConnections: true,
+    connectionLimit: 10,
+    multipleStatements:true
 
 });
 
@@ -422,23 +403,23 @@ app.listen(4000, () => {
 app.put('/api/studprofile/:studentId', (req, res) => {
     const studentId = req.params.studentId;
     const { first_name, last_name, year_level, course } = req.body;
-    
+
     const query = `
         UPDATE students 
         SET first_name = ?, last_name = ?, year_level = ?, course = ? 
         WHERE Student_ID = ?
     `;
-    
+
     connection.query(query, [first_name, last_name, year_level, course, studentId], (error, results) => {
         if (error) {
             console.error('Error updating student:', error);
             return res.status(500).json({ error: 'Internal server error' });
         }
-        
+
         if (results.affectedRows === 0) {
             return res.status(404).json({ error: 'Student not found' });
         }
-        
+
         res.json({ message: 'Profile updated successfully' });
     });
 });
@@ -626,5 +607,3 @@ app.get('/api/session-history/:studentId', (req, res) => {
         res.json(formattedResults);
     });
 });
-
-
