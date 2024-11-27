@@ -1,0 +1,229 @@
+  body {
+    background-color: rgb(232, 232, 232);
+  }
+
+  .shape {
+    display: inline-block;
+    background-color: white !important;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .shape.rectangle {
+    width: 680px;
+    height: 300px;
+    padding: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .square {
+    width: 332px;
+    height: 300px;
+  }
+
+  .square2 {
+    width: 680px;
+    height: 500px;
+  }
+
+  .first {
+    background-color: maroon !important;
+  }
+
+  .info-panel {
+    padding: 15px;
+    background-color: #333;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rectangle-icon {
+    width: 200px;
+    height: 200px;
+  }
+
+  .icon-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10%;
+  }
+
+  .text-white {
+    text-align: left;
+  }
+
+  #username {
+    font-weight: bold;
+    font-size: 35px;
+    margin-bottom: 5px;
+    margin-left: 30px;
+  }
+
+  #manageComputersBtn {
+    margin-top: 5px;
+    background-color: maroon;
+    color: white;
+  }
+
+  .computer-card {
+    height: 250px !important;
+    /* Increased height */
+    transition: transform 0.2s;
+    text-align: center;
+  }
+
+  .computer-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .computer-icon {
+    font-size: 100px;
+    margin-bottom: 10px;
+  }
+
+  .computer-status {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .computer-user {
+    font-size: 14px;
+  }
+
+  .computer-status.occupied {
+    color: #dc3545;
+  }
+
+  .computer-status.available {
+    color: #28a745;
+  }
+
+  .computer-status.requesting {
+    color: #d3dd14;
+  }
+
+  .computer-name {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  body {
+    background-color: rgb(232, 232, 232);
+  }
+
+  .shape {
+    display: inline-block;
+    background-color: white !important;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .shape.rectangle {
+    width: 680px;
+    height: 300px;
+    padding: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+  }
+
+  .square {
+    width: 332px;
+    height: 300px;
+  }
+
+  .square2 {
+    width: 680px;
+    height: 500px;
+  }
+
+  .first {
+    background-color: maroon !important;
+  }
+
+  .info-panel {
+    padding: 15px;
+    background-color: #333;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .rectangle-icon {
+    width: 200px;
+    height: 200px;
+  }
+
+  .icon-img {
+    width: 100%;
+    height: auto;
+    border-radius: 10%;
+  }
+
+  .text-white {
+    text-align: left;
+  }
+
+  #username {
+    font-weight: bold;
+    font-size: 35px;
+    margin-bottom: 5px;
+    margin-left: 30px;
+  }
+
+  #manageComputersBtn {
+    margin-top: 5px;
+    background-color: maroon;
+    color: white;
+  }
+
+  .computer-card {
+    height: 250px !important;
+    /* Increased height */
+    transition: transform 0.2s;
+    text-align: center;
+  }
+
+  .computer-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .computer-icon {
+    font-size: 100px;
+    margin-bottom: 10px;
+  }
+
+  .computer-status {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .computer-user {
+    font-size: 14px;
+  }
+
+  .computer-status.occupied {
+    color: #dc3545;
+  }
+
+  .computer-status.available {
+    color: #28a745;
+  }
+
+  .computer-status.requesting {
+    color: #d3dd14;
+  }
+
+  .computer-name {
+    font-size: 25px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }

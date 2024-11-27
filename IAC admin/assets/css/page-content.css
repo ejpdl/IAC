@@ -1,0 +1,30 @@
+.page-content {
+    background-color: #ececec;
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+    padding: 20px;
+    height: 100vh;
+}
+
+.page-content h1 {
+    background: maroon;
+    background: linear-gradient(to right, #6c2626 0%, #ca6060 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+}
+
+
+.page-content h2 {
+    background: maroon;
+    background: linear-gradient(to right, #6c2626 0%, #ca6060 100%);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 1.8rem;
+}
+
+
+
+.about-container h3 {
+    color: #6b2626;
+}

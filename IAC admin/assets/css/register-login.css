@@ -1,0 +1,92 @@
+body,
+html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-section {
+  background: url('../images/image.png') no-repeat center center;
+  background-size: cover;
+  height: 60%;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* Maroon Overlay */
+.top-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(128, 0, 0, 0.4);
+  /* Maroon overlay with 60% opacity */
+  z-index: 1;
+}
+
+
+.bottom-section {
+  height: 40%;
+  background-color: #eaeaea;
+}
+
+.form-container {
+  background-color: white;
+  border-radius: 8px;
+  padding: 30px;
+  padding-bottom: 3rem;
+  max-width: 700px;
+  width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.form-container h2 {
+  color: #800000;
+  font-size: 2.25em;
+  font-weight: bold;
+}
+
+.btn-maroon {
+  background-color: #800000;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-maroon:hover {
+  background-color: #600000;
+  color: white;
+}
+
+.logo {
+  width: 125px;
+  height: 125px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+}
+
+.form-row>div {
+  flex: 1;
+}
+
+.page-container {
+  position: relative;
+  height: 100%;
+}

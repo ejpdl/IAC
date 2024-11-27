@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form Submission Report</title>
+  <link rel="stylesheet" href="assets/css/print-form.css">
+  <style>
+    .chart-container {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+    }
+
+    @media print {
+      .month-selection {
+        display: none;
+      }
+
+      .chart-container {
+        break-inside: avoid;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-control {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 200px;
+    }
+
+    .print-button {
+      background-color: #800000;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .print-button:hover {
+      background-color: #600000;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="month-selection">
+    <div class="form-group">
+      <h5><label for="monthSelector">Select Month:</label></h5>
+      <select id="monthSelector" class="form-control">
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <h5><label for="yearSelector">Select Year:</label></h5>
+      <select id="yearSelector" class="form-control">
+        <script>
+          const currentYear = new Date().getFullYear();
+          for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+            document.write(`<option value="${i}">${i}</option>`);
+          }
+        </script>
+      </select>
+    </div>
+    <button class="print-button" onclick="window.print();">Print Report</button>
+  </div>
+
+  <div class="form-container">
+    <table>
+      <tr>
+        <td colspan="4" rowspan="2" class="no-border header-section">
+          <img src="assets/images/logo.png" alt="Logo">
+          <div>
+            Manuel S. Enverga University Foundation Candelaria, Inc. Quezon, Philippines
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4"><strong>IAC Monitoring System</strong></td>
+        <td rowspan="2"><strong>Date: <span id="currentDate"></span></strong></td>
+      </tr>
+      <tr>
+        <td colspan="2"><strong>Latest Department Usage Report as of <span id="currentDate2"></span></strong></td>
+      </tr>
+    </table>
+
+    <div class="content">
+      <p style="text-align: center;"><strong>Year Level Usage Distribution</strong></p>
+      <table>
+        <thead>
+          <tr>
+            <th>Year Level</th>
+            <th>Usage Count</th>
+          </tr>
+        </thead>
+        <tbody class="submission-data">
+          <!-- Data will be populated dynamically -->
+        </tbody>
+      </table>
+
+      <!-- Chart container -->
+      <div class="chart-container">
+        <canvas id="yearLevelChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Set current date
+    function formatDate(date) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    const today = new Date();
+    document.getElementById('currentDate').textContent = formatDate(today);
+    document.getElementById('currentDate2').textContent = formatDate(today);
+
+    // Initialize chart
+    let yearLevelChart = null;
+
+    function initializeChart() {
+      const ctx = document.getElementById('yearLevelChart').getContext('2d');
+      yearLevelChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Usage Count',
+            data: [],
+            backgroundColor: '#800000',
+            borderColor: '#800000',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: 'Year Level Usage Distribution',
+              font: {
+                size: 16,
+                weight: 'bold'
+              },
+              color: '#800000'
+            }
+          },
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Year Level',
+                color: '#800000',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              },
+              ticks: {
+                color: '#800000'
+              }
+            },
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Usage Count',
+                color: '#800000',
+                font: {
+                  size: 14,
+                  weight: 'bold'
+                }
+              },
+              ticks: {
+                color: '#800000'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Function to update chart and table data
+    function updateData() {
+      const month = document.getElementById('monthSelector').value;
+      const year = document.getElementById('yearSelector').value;
+
+      // Replace this URL with your actual API endpoint
+      fetch(`https://iac-api-admin.onrender.com/api/year-level-usage/${month}/${year}`)
+        .then(response => response.json())
+        .then(data => {
+          // Update table
+          const tbody = document.querySelector('.submission-data');
+          tbody.innerHTML = '';
+          data.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${item.year_level}</td>
+              <td>${item.usage_count}</td>
+            `;
+            tbody.appendChild(row);
+          });
+
+          // Update chart
+          if (yearLevelChart) {
+            yearLevelChart.data.labels = data.map(item => item.year_level);
+            yearLevelChart.data.datasets[0].data = data.map(item => item.usage_count);
+            yearLevelChart.update();
+          }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    // Initialize everything when the document is loaded
+    document.addEventListener('DOMContentLoaded', function () {
+      // Set current month and year in selectors
+      const currentMonth = today.getMonth() + 1;
+      document.getElementById('monthSelector').value = currentMonth;
+      document.getElementById('yearSelector').value = today.getFullYear();
+
+      // Initialize chart
+      initializeChart();
+
+      // Set up event listeners
+      document.getElementById('monthSelector').addEventListener('change', updateData);
+      document.getElementById('yearSelector').addEventListener('change', updateData);
+
+      // Initial data load
+      updateData();
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,208 @@
+#sidebar {
+    position: sticky !important;
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    background: rgb(107, 1, 1);
+    background: linear-gradient(356deg, maroon 0%, rgb(156, 70, 70) 55%, rgb(120, 40, 40) 100%);
+    color: white;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+
+    #sidebar.active {
+        margin-left: 0;
+    }
+
+    #sidebar .d-none {
+        display: block !important;
+    }
+}
+
+.custom-navbar {
+    background-color: #ffffff;
+}
+
+
+
+
+.btn-info {
+    border: none;
+    color: #ffffff !important;
+    background: maroon;
+    background: linear-gradient(356deg, maroon 0%, rgb(156, 70, 70) 55%, rgb(120, 40, 40) 100%);
+}
+
+.btn-info .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+#sidebar .logo {
+    width: 80px;
+    margin: 10px auto;
+    display: block;
+}
+
+#sidebar .admin-title {
+    text-align: center;
+    width: 100%;
+    justify-content: center;
+    font-weight: 500;
+}
+
+#sidebar .nav {
+    width: 100%;
+}
+
+#menu li {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+#menu li a {
+    transition: background-color 0.3s, color 0.3s;
+    width: 100%;
+    display: block;
+    padding: 10px 15px;
+    border-radius: 5px;
+}
+
+#menu li a h8 {
+    margin-left: 20px;
+}
+
+#menu li a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+#sidebar .d-flex {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+#sidebar .logo-container {
+    padding: 0 15px;
+    width: 100%;
+}
+
+.profile-icon {
+    color: maroon;
+    margin-right: 5px;
+}
+
+.navbar-brand {
+    color: maroon;
+    margin-right: 25px !important;
+}
+
+#submenu {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+
+#submenu .nav-link {
+    padding: 5px 15px;
+    font-size: 0.9em;
+}
+
+#submenu .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.arrow-icon {
+    transition: transform 0.3s ease;
+    margin-right: 20px;
+}
+
+#menu li a[aria-expanded="true"] .arrow-icon {
+    transform: rotate(90deg);
+}
+
+#menu li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#menu li a h8 {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#menu li a .arrow-icon {
+    margin-left: auto;
+}
+
+.icon-size {
+    font-size: 1.5rem;
+    margin-right: 10px;
+}
+
+.header-right {
+    position: relative;
+    display: inline-block;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+.header-right .account-name {
+    margin-left: 8px;
+    font-weight: bold;
+    color: maroon;
+    /* Set account name color to maroon */
+}
+
+.header-right i.fas.fa-chevron-down {
+    margin-left: 10px;
+    color: maroon;
+    /* Set chevron icon color to maroon */
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #800000;
+    /* Maroon background for dropdown */
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.dropdown-menu.show {
+    display: block;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    color: white;
+    /* Set dropdown text color to white */
+    text-decoration: none;
+    display: block;
+    font-weight: 500;
+    background-color: #800000;
+    /* Set dropdown item background to maroon */
+}
+
+.dropdown-item:hover {
+    background-color: #a52a2a;
+    /* Darker maroon on hover */
+}
+
+.header-right .fas.fa-user {
+    font-size: 20px;
+    color: maroon;
+    /* Set user icon color to maroon */
+}
