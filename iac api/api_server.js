@@ -4,6 +4,8 @@ const cors = require('cors');
 const moment = require('moment');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cron = require('cron');
+const https = require('https');
 
 require('moment-timezone');
 
@@ -39,6 +41,37 @@ const connection = mysql.createPool({
 
 });
 
+//PINGER TO AVOID SERVER SLEEP
+// Cron job to keep the server alive
+const job = new cron.CronJob('*/1 * * * *', function () {
+    console.log('Pinging server to keep it alive');
+    https.get('https://flutterapi-q64f.onrender.com/ping', (res) => {
+        if (res.statusCode === 200) {
+            console.log('Server pinged successfully');
+        } else {
+            console.error(`Failed to ping server.Status code: ${res.statusCode}`);
+        }
+    }).on('error', (err) => {
+        console.error('Error pinging server:', err.message);
+    });
+
+    // After 30 seconds, ping the server again
+    setTimeout(() => {
+        console.log('Pinging server after 30 seconds...');
+        https.get('https://flutterapi-q64f.onrender.com/ping', (res) => {
+            if (res.statusCode === 200) {
+                console.log('Server pinged successfully');
+            } else {
+                console.error(`Failed to ping server. Status code: ${res.statusCode}`);
+            }
+        }).on('error', (err) => {
+            console.error('Error pinging server:', err.message);
+        });
+    }, 30000);  // 30000 ms = 30 seconds
+});
+app.get("/ping", (req, res) => {
+    res.status(200).send("Server is alive");
+});
 
 const verifyToken = (req, res, next) => {
 
@@ -393,6 +426,7 @@ const PORT = process.env.PORT || 4000;
 app.listen(4000, () => {
 
     console.log(`Server is running at PORT ${PORT}`);
+    job.start();
 
 })
 
