@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 const moment = require('moment');
 const cors = require('cors');
+const cron = require('cron');
+const https = require('https');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -37,6 +39,39 @@ const connection = mysql.createPool({
     connectionLimit: 10,
     multipleStatements: true
 
+});
+
+//PINGER TO AVOID SERVER SLEEP
+// Cron job to keep the server alive
+const job = new cron.CronJob('*/1 * * * *', function () {
+    console.log('Pinging server to keep it alive');
+    https.get('https://iac-admin-api.onrender.com/ping', (res) => {
+        if (res.statusCode === 200) {
+            console.log('Server pinged successfully');
+        } else {
+            console.error(`Failed to ping server.Status code: ${res.statusCode}`);
+        }
+    }).on('error', (err) => {
+        console.error('Error pinging server:', err.message);
+    });
+
+    // After 30 seconds, ping the server again
+    setTimeout(() => {
+        console.log('Pinging server after 30 seconds...');
+        https.get('https://iac-admin-api.onrender.com/ping', (res) => {
+            if (res.statusCode === 200) {
+                console.log('Server pinged successfully');
+            } else {
+                console.error(`Failed to ping server. Status code: ${res.statusCode}`);
+            }
+        }).on('error', (err) => {
+            console.error('Error pinging server:', err.message);
+        });
+    }, 30000);  // 30000 ms = 30 seconds
+});
+
+app.get("/ping", (req, res) => {
+    res.status(200).send("Server is alive");
 });
 
 // FOR AUTHENTICATION AND AUTHORIZATION
@@ -1015,5 +1050,6 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
 
     console.log(`Server is running at PORT ${PORT}`);
+    job.start();
 
 })
