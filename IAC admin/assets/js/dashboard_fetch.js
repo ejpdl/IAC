@@ -35,7 +35,7 @@ async function loadData() {
 
     if (!token) {
 
-        alert(`No token found. Please log in again`);
+        console.log(`No token found. Redirecting to login page...`);
         return;
 
     }
@@ -87,7 +87,7 @@ async function AvailablePc() {
 
     if (!token) {
 
-        console.log(`No token found. Please Log in again`);
+        console.log(`No token found. Redirecting to Login page...`);
         return;
 
     }
@@ -136,7 +136,7 @@ async function SessionHistory() {
 
     if (!token) {
 
-        console.log(`No token found. Please Log in again`);
+        console.log(`No token found. Redirecting to Login page...`);
         return;
 
     }
@@ -198,7 +198,7 @@ async function EditAdmin(Admin_ID) {
 
     if (!token) {
 
-        console.log(`No token found. Please Log in again`);
+        console.log(`No token found. Redirecting to Login page...`);
         return;
 
     }

@@ -115,6 +115,43 @@
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
   <script>
+    function confirmLogout() {
+      // Ask for confirmation before proceeding with logout
+      var confirmation = confirm("Are you sure you want to log out?");
+      if (confirmation) {
+        // Clear localStorage to invalidate the session
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminId');
+
+        // Notify the server about the logout and redirect to login page
+        fetch('?ajax_logout=true')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Redirect to login page
+              window.location.href = '../login.html?logout_success=1';
+            } else {
+              // Fallback redirect if server response isn't successful
+              window.location.href = '../login.html';
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            // Fallback redirect on error
+            window.location.href = '../login.html';
+          });
+      }
+    };
+
+    // Add token validation on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Redirect to login page if no token exists
+        window.location.href = '../login.html';
+      }
+    });
+
     function searchTable() {
       const input = document.getElementById("searchInput").value.toUpperCase();
       const table = document.querySelector("table tbody");

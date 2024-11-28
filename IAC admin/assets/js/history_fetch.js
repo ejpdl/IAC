@@ -5,7 +5,7 @@ async function loadData() {
 
     if (!token) {
 
-        alert(`No token found. Please log in again`);
+        console.log(`No token found. Redirecting to login page...`);
         return;
 
     }
@@ -51,7 +51,7 @@ loadData();
 async function SessionHistory() {
     const token = localStorage.getItem('token');
     if (!token) {
-        alert(`No token found. Please log in again`);
+        console.log(`No token found. Redirecting to login page...`);
         return;
     }
     try {

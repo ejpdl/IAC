@@ -35,7 +35,7 @@ async function loadData() {
 
   if (!token) {
 
-    alert(`No token found. Please log in again`);
+    console.log(`No token found. Redirecting to login page...`);
     return;
 
   }
@@ -83,7 +83,7 @@ async function addComputers() {
 
   const token = localStorage.getItem('token');
   if (!token) {
-    alert(`No token found. Please log in again`);
+    console.log(`No token found. Redirecting to login page...`);
     return;
   }
   const newPc = {
@@ -141,7 +141,7 @@ document.getElementById("ComputerForm").addEventListener("submit", (event) => {
 async function deleteComputers() {
   const token = localStorage.getItem('token');
   if (!token) {
-    alert(`No token found. Please log in again`);
+    console.log(`No token found. Redirecting to login page...`);
     return;
   }
 
