@@ -1,3 +1,5 @@
+
+
 // DISPLAY THE DATA OF THE USER
 async function loadData() {
 

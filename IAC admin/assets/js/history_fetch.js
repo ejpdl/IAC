@@ -1,3 +1,21 @@
+// Check and redirect if the user is logged out
+document.addEventListener("DOMContentLoaded", () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        console.log("Redirecting to login due to missing token.");
+        window.location.href = "login.html"; // Update this to your login page URL
+    }
+
+    // Refresh page if accessed via browser back button
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+});
+
+
 // DISPLAY THE DATA OF THE USER
 async function loadData() {
 
