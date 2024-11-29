@@ -130,6 +130,86 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header" style="color: white; background-color: maroon;">
+          <h5 class="modal-title" id="editStudentModalLabel">Edit Student</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editStudentForm">
+            <input type="hidden" id="editStudentId" name="studentId">
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="editFirstName" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="editFirstName" name="firstName" required>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="editLastName" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="editLastName" name="lastName" required>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="editYearLevel" class="form-label">Year Level</label>
+              <select class="form-select" id="editYearLevel" name="yearLevel" required>
+                <option value="1st Year">1st Year</option>
+                <option value="2nd Year">2nd Year</option>
+                <option value="3rd Year">3rd Year</option>
+                <option value="4th Year">4th Year</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editCourse" class="form-label">Course</label>
+              <select class="form-select" id="editCourse" name="course" required>
+                <option value="BSCS">BSCS</option>
+                <option value="BSIT">BSIT</option>
+                <option value="BSSE">BSSE</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editPassword" class="form-label">Password</label>
+              <div class="input-group">
+                <input type="password" class="form-control" id="editPassword" name="password">
+                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" style="background-color: maroon !important;"
+            onclick="saveStudentChanges()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add this modal in the same location as the edit student modal -->
+  <div class="modal fade" id="deleteStudentModal" tabindex="-1" aria-labelledby="deleteStudentModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white" style="background-color: maroon !important;">
+          <h5 class="modal-title" id="deleteStudentModalLabel">Confirm Delete</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this student?</p>
+          <input type="hidden" id="deleteStudentId">
+          <p class="text-muted small">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" style="background-color: maroon !important;"
+            onclick="confirmDeleteStudent()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="assets/js/students_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
@@ -245,14 +325,6 @@
       renderTable();
     }
 
-    function editStudent(studentId) {
-      alert('Edit student with ID: ' + studentId);
-    }
-
-    function deleteStudent(studentId) {
-      alert('Delete student with ID: ' + studentId);
-    }
-
     function updatePaginationControls() {
       const totalPages = Math.ceil(filteredData.length / rowsPerPage);
       document.getElementById('currentPageDisplay').textContent = `Page ${currentPage} of ${totalPages}`;
@@ -273,6 +345,112 @@
     }
 
     document.addEventListener('DOMContentLoaded', fetchStudents);
+  </script>
+  <script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function () {
+      const passwordInput = document.getElementById('editPassword');
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+
+      // Toggle eye icon
+      this.querySelector('i').classList.toggle('fa-eye');
+      this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // Function to open edit modal
+    function editStudent(studentId) {
+      // Get the row of the student to be edited
+      const row = event.target.closest('tr');
+
+      // Split full name into first and last name
+      const fullName = row.cells[1].textContent.trim();
+      const nameParts = fullName.split(' ');
+      const lastName = nameParts.pop();
+      const firstName = nameParts.join(' ');
+
+      // Populate modal fields with current student data
+      document.getElementById('editStudentId').value = studentId;
+      document.getElementById('editFirstName').value = firstName;
+      document.getElementById('editLastName').value = lastName;
+      document.getElementById('editYearLevel').value = row.cells[2].textContent;
+      document.getElementById('editCourse').value = row.cells[3].textContent;
+      document.getElementById('editPassword').value = ''; // Clear password field
+
+      // Show the modal
+      const editModal = new bootstrap.Modal(document.getElementById('editStudentModal'));
+      editModal.show();
+    }
+
+    // Function to save student changes
+    function saveStudentChanges() {
+      // Get form values
+      const studentId = document.getElementById('editStudentId').value;
+      const firstName = document.getElementById('editFirstName').value;
+      const lastName = document.getElementById('editLastName').value;
+      const fullName = `${firstName} ${lastName}`;
+      const yearLevel = document.getElementById('editYearLevel').value;
+      const course = document.getElementById('editCourse').value;
+      const password = document.getElementById('editPassword').value;
+
+      // Find the corresponding row to update
+      const rows = document.querySelectorAll('table tbody tr');
+      rows.forEach(row => {
+        if (row.cells[0].textContent === studentId) {
+          row.cells[1].textContent = fullName;
+          row.cells[2].textContent = yearLevel;
+          row.cells[3].textContent = course;
+        }
+      });
+
+      // Close the modal
+      const editModal = bootstrap.Modal.getInstance(document.getElementById('editStudentModal'));
+      editModal.hide();
+
+      // Optional: Add AJAX call to update student in backend
+      // This is a placeholder for actual backend integration
+      console.log('Student updated:', {
+        studentId,
+        firstName,
+        lastName,
+        yearLevel,
+        course,
+        passwordProvided: !!password
+      });
+    }
+  </script>
+  <script>
+    // Modify the existing delete button onclick to show confirmation modal
+    function deleteStudent(studentId) {
+      // Set the student ID in the hidden input
+      document.getElementById('deleteStudentId').value = studentId;
+
+      // Show the delete confirmation modal
+      const deleteModal = new bootstrap.Modal(document.getElementById('deleteStudentModal'));
+      deleteModal.show();
+    }
+
+    // Add a function to handle confirmed deletion
+    function confirmDeleteStudent() {
+      // Get the student ID from the hidden input
+      const studentId = document.getElementById('deleteStudentId').value;
+
+      // Find and remove the corresponding row
+      const rows = document.querySelectorAll('table tbody tr');
+      rows.forEach(row => {
+        if (row.cells[0].textContent === studentId) {
+          row.remove();
+        }
+      });
+
+      // Close the modal
+      const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteStudentModal'));
+      deleteModal.hide();
+
+      // Optional: Add AJAX call to delete student in backend
+      // This is a placeholder for actual backend integration
+      console.log('Student deleted:', studentId);
+    }
   </script>
 </body>
 

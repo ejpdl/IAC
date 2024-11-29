@@ -228,6 +228,31 @@
                   </div>
                 </div>
                 <!-- End of Computer Details Modal -->
+
+                <!-- Add this modal for session end notification -->
+                <div class="modal fade" id="sessionEndNotificationModal" tabindex="-1"
+                  aria-labelledby="sessionEndNotificationLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header bg-danger text-white" style="background-color: maroon !important;">
+                        <h5 class="modal-title" id="sessionEndNotificationLabel">Session Ended</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                          aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body text-center">
+                        <i class="fas fa-check-circle text-success"
+                          style="font-size: 70px; color: maroon !important;"></i>
+                        <p class="mt-3 h4">Computer Session Ended on PC_01</p>
+                        <p class="text-muted">The computer is now available for other users.</p>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                          style="background-color: maroon;">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- End of Session end notification Modal -->
               </div>
             </div>
           </div>
@@ -300,6 +325,28 @@
             e.stopPropagation(); // Prevent event bubbling
           });
         });
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Add event listener for End Session button
+        const endSessionBtn = document.getElementById('endSessionBtn');
+        if (endSessionBtn) {
+          endSessionBtn.addEventListener('click', function () {
+            // Close the computer details modal
+            const computerDetailsModal = bootstrap.Modal.getInstance(document.getElementById('computerDetailsModal'));
+            if (computerDetailsModal) {
+              computerDetailsModal.hide();
+            }
+
+            // Show the session end notification modal
+            const sessionEndModal = new bootstrap.Modal(document.getElementById('sessionEndNotificationModal'));
+            sessionEndModal.show();
+
+            // Here you would typically also make an AJAX call to update the backend
+            // about the session being ended
+          });
+        }
       });
     </script>
 
