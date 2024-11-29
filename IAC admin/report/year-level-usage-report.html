@@ -211,7 +211,7 @@
       const year = document.getElementById('yearSelector').value;
 
       // Replace this URL with your actual API endpoint
-      fetch(`https://iac-api-admin.onrender.com/api/year-level-usage/${month}/${year}`)
+      fetch(`https://iac-admin-api.onrender.com/api/year-level-usage/${month}/${year}`)
         .then(response => response.json())
         .then(data => {
           // Update table
