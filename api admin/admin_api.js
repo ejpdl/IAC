@@ -2,8 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 const moment = require('moment');
 const cors = require('cors');
-const cron = require('cron');
-const https = require('https');
+// const cron = require('cron');
+// const https = require('https');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -28,51 +28,76 @@ const logger = (req, res, next) => {
 
 app.use(logger);
 
-const connection = mysql.createPool({
+const connection = mysql.createConnection({
 
-    host: "srv545.hstgr.io",
-    user: "u579076463_iacmonitoring",
-    password: "Iacmonitoring@2024",
-    // database: "internet_access_center"
-    database: "u579076463_iacmonitoring",
-    waitForConnections: true,
-    connectionLimit: 10,
-    multipleStatements: true
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "internet_access_center"
+
 
 });
+
+connection.connect((err) => {
+
+    if(err){
+
+        console.log(`Error Connecting on the database MYSQL: ${err}`);
+        return;
+
+    }else{
+
+        console.log(`Successfully Connected to ${connection.config.database}`);
+
+    }
+
+});
+
+// const connection = mysql.createPool({
+
+//     host: "srv545.hstgr.io",
+//     user: "u579076463_iacmonitoring",
+//     password: "Iacmonitoring@2024",
+//     // database: "internet_access_center"
+//     database: "u579076463_iacmonitoring",
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     multipleStatements: true
+
+// });
 
 //PINGER TO AVOID SERVER SLEEP
 // Cron job to keep the server alive
-const job = new cron.CronJob('*/1 * * * *', function () {
-    console.log('Pinging server to keep it alive');
-    https.get('https://iac-admin-api.onrender.com/ping', (res) => {
-        if (res.statusCode === 200) {
-            console.log('Server pinged successfully');
-        } else {
-            console.error(`Failed to ping server.Status code: ${res.statusCode}`);
-        }
-    }).on('error', (err) => {
-        console.error('Error pinging server:', err.message);
-    });
+// const job = new cron.CronJob('*/1 * * * *', function () {
+//     console.log('Pinging server to keep it alive');
+//     https.get('https://iac-admin-api.onrender.com/ping', (res) => {
+//         if (res.statusCode === 200) {
+//             console.log('Server pinged successfully');
+//         } else {
+//             console.error(`Failed to ping server.Status code: ${res.statusCode}`);
+//         }
+//     }).on('error', (err) => {
+//         console.error('Error pinging server:', err.message);
+//     });
 
-    // After 30 seconds, ping the server again
-    setTimeout(() => {
-        console.log('Pinging server after 30 seconds...');
-        https.get('https://iac-admin-api.onrender.com/ping', (res) => {
-            if (res.statusCode === 200) {
-                console.log('Server pinged successfully');
-            } else {
-                console.error(`Failed to ping server. Status code: ${res.statusCode}`);
-            }
-        }).on('error', (err) => {
-            console.error('Error pinging server:', err.message);
-        });
-    }, 30000);  // 30000 ms = 30 seconds
-});
+//     // After 30 seconds, ping the server again
+//     setTimeout(() => {
+//         console.log('Pinging server after 30 seconds...');
+//         https.get('https://iac-admin-api.onrender.com/ping', (res) => {
+//             if (res.statusCode === 200) {
+//                 console.log('Server pinged successfully');
+//             } else {
+//                 console.error(`Failed to ping server. Status code: ${res.statusCode}`);
+//             }
+//         }).on('error', (err) => {
+//             console.error('Error pinging server:', err.message);
+//         });
+//     }, 30000);  // 30000 ms = 30 seconds
+// });
 
-app.get("/ping", (req, res) => {
-    res.status(200).send("Server is alive");
-});
+// app.get("/ping", (req, res) => {
+//     res.status(200).send("Server is alive");
+// });
 
 // FOR AUTHENTICATION AND AUTHORIZATION
 const verifyToken = async (req, res, next) => {
@@ -860,63 +885,6 @@ app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
 });
 
 
-// EDIT STUDENT DATA
-app.put(`/admin/edit-student/`, async (req, res) => {
-
-    const { first_name, last_name, year_level, course, Student_ID } = req.body;
-
-    try {
-
-        const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?  WHERE Student_ID = ?`;
-
-        connection.query(query, [first_name, last_name, year_level, course, Student_ID], (err, results) => {
-
-            if (err) {
-
-                return res.status(500).json({ error: err.message });
-
-            }
-
-            if (results.affectedRows === 0) {
-
-                return res.status(404).json({ error: `No record found to update.` });
-
-            }
-
-            console.log(`Successfully updated Student with Student ID: ${Student_ID}`);
-            res.status(200).json({ msg: `Successfully Updated!` });
-
-        })
-
-    } catch (error) {
-
-        console.log(error);
-
-    }
-
-});
-
-
-// DELETE A STUDENT
-app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
-
-    const { Student_ID } = req.params;
-
-    const query = `DELETE FROM students WHERE Student_ID = ?`;
-
-    connection.query(query, [Student_ID], (err, rows) => {
-
-        if (err) {
-
-            return res.status(500).json({ error: err.message });
-
-        }
-
-        res.status(200).json({ msg: `Successfully Deleted!` });
-
-    });
-
-});
 
 // Backend Express Route
 app.get('/api/year-level-usage/:month/:year', (req, res) => {
@@ -1045,11 +1013,112 @@ app.put(`/admin/update-info`, verifyToken, async (req, res) => {
 
 });
 
+// VIEW A STUDENT
+app.get(`/list/students/:Student_ID`, verifyToken, async (req, res) => {
+
+    const { Student_ID } = req.params;
+
+    try{
+
+        const query = `SELECT * FROM students WHERE Student_ID = ?`;
+
+        connection.query(query, [Student_ID], (err, rows) => {
+
+            if(err){
+
+                res.status(400).json({ error: err.message });
+
+            }
+
+            if(rows.length === 0){
+
+                return res.status(404).json({ error: "User not found" });
+                
+            }
+
+            res.status(200).json(rows[0]);
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
+
+// UPDATE A STUDENT
+app.put(`/update/student`, verifyToken, async (req, res) => {
+    
+    const { first_name, last_name, year_level, course, password, Student_ID } = req.body;
+
+    try{
+
+        const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?, password = ? WHERE Student_ID = ?`;
+
+        connection.query(query, [first_name, last_name, year_level, course, password, Student_ID], (err, results) => {
+            
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            if (results.affectedRows === 0) {
+                
+                return res.status(404).json({ error: `No record found to update.` });
+            
+            }
+
+            console.log(`Successfully updated User with Student ID: ${Student_ID}`);
+            res.status(200).json({ msg: `Successfully Updated!` });
+
+        });
+
+    }catch(error){
+        
+        console.log(error)
+    
+    }
+
+});
+
+
+// DELETE A STUDENT
+app.delete(`/delete/student/:Student_ID`, verifyToken, async (req, res) => {
+
+    const { Student_ID } = req.params;
+
+    const query = `DELETE FROM students WHERE Student_ID = ?`;
+
+    connection.query(query, [Student_ID], (err, result) => {
+
+        if (err) {
+
+            return res.status(500).json({ error: err.message });
+
+        }
+
+        if (result.affectedRows === 0) {
+
+            return res.status(404).json({ msg: 'Student not found' });
+
+        }
+
+        res.status(200).json({ msg: 'Successfully Deleted!', deletedRows: result.affectedRows });
+
+    });
+
+});
+
+
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
 
     console.log(`Server is running at PORT ${PORT}`);
-    job.start();
+    // job.start();
 
 })
