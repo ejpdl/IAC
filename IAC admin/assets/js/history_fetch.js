@@ -30,7 +30,7 @@ async function loadData() {
 
     try {
 
-        const response = await fetch(`https://iac-admin-api.onrender.com/admin/details`, {
+        const response = await fetch(`http://localhost:3000/admin/details`, {
 
             method: 'GET',
             headers: {
@@ -73,7 +73,7 @@ async function SessionHistory() {
         return;
     }
     try {
-        const response = await fetch(`https://iac-admin-api.onrender.com/admin/session-history`, {
+        const response = await fetch(`http://localhost:3000/admin/session-history`, {
             method: 'GET',
             headers: {
                 'Authorization': token,
