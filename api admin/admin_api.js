@@ -859,65 +859,6 @@ app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
 
 });
 
-
-// EDIT STUDENT DATA
-app.put(`/admin/edit-student/`, async (req, res) => {
-
-    const { first_name, last_name, year_level, course, Student_ID } = req.body;
-
-    try {
-
-        const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?  WHERE Student_ID = ?`;
-
-        connection.query(query, [first_name, last_name, year_level, course, Student_ID], (err, results) => {
-
-            if (err) {
-
-                return res.status(500).json({ error: err.message });
-
-            }
-
-            if (results.affectedRows === 0) {
-
-                return res.status(404).json({ error: `No record found to update.` });
-
-            }
-
-            console.log(`Successfully updated Student with Student ID: ${Student_ID}`);
-            res.status(200).json({ msg: `Successfully Updated!` });
-
-        })
-
-    } catch (error) {
-
-        console.log(error);
-
-    }
-
-});
-
-
-// DELETE A STUDENT
-app.delete(`/admin/delete/:Student_ID`, async (req, res) => {
-
-    const { Student_ID } = req.params;
-
-    const query = `DELETE FROM students WHERE Student_ID = ?`;
-
-    connection.query(query, [Student_ID], (err, rows) => {
-
-        if (err) {
-
-            return res.status(500).json({ error: err.message });
-
-        }
-
-        res.status(200).json({ msg: `Successfully Deleted!` });
-
-    });
-
-});
-
 // Backend Express Route
 app.get('/api/year-level-usage/:month/:year', (req, res) => {
     const { month, year } = req.params;
@@ -1045,6 +986,104 @@ app.put(`/admin/update-info`, verifyToken, async (req, res) => {
 
 });
 
+// VIEW A STUDENT
+app.get(`/list/students/:Student_ID`, verifyToken, async (req, res) => {
+
+    const { Student_ID } = req.params;
+
+    try{
+
+        const query = `SELECT * FROM students WHERE Student_ID = ?`;
+
+        connection.query(query, [Student_ID], (err, rows) => {
+
+            if(err){
+
+                res.status(400).json({ error: err.message });
+
+            }
+
+            if(rows.length === 0){
+
+                return res.status(404).json({ error: "User not found" });
+                
+            }
+
+            res.status(200).json(rows[0]);
+
+        });
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+});
+
+// UPDATE A STUDENT
+app.put(`/update/student`, verifyToken, async (req, res) => {
+    
+    const { first_name, last_name, year_level, course, password, Student_ID } = req.body;
+
+    try{
+
+        const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?, password = ? WHERE Student_ID = ?`;
+
+        connection.query(query, [first_name, last_name, year_level, course, password, Student_ID], (err, results) => {
+            
+            if(err){
+
+                return res.status(500).json({ error: err.message });
+
+            }
+
+            if (results.affectedRows === 0) {
+                
+                return res.status(404).json({ error: `No record found to update.` });
+            
+            }
+
+            console.log(`Successfully updated User with Student ID: ${Student_ID}`);
+            res.status(200).json({ msg: `Successfully Updated!` });
+
+        });
+
+    }catch(error){
+        
+        console.log(error)
+    
+    }
+
+});
+
+
+// DELETE A STUDENT
+app.delete(`/delete/student/:Student_ID`, verifyToken, async (req, res) => {
+
+    const { Student_ID } = req.params;
+
+    const query = `DELETE FROM students WHERE Student_ID = ?`;
+
+    connection.query(query, [Student_ID], (err, result) => {
+
+        if (err) {
+
+            return res.status(500).json({ error: err.message });
+
+        }
+
+        if (result.affectedRows === 0) {
+
+            return res.status(404).json({ msg: 'Student not found' });
+
+        }
+
+        res.status(200).json({ msg: 'Successfully Deleted!', deletedRows: result.affectedRows });
+
+    });
+
+});
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
