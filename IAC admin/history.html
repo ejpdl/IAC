@@ -115,6 +115,7 @@
   <script src="assets/js/history_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
+
   <script>
     function confirmLogout() {
       // Ask for confirmation before proceeding with logout
@@ -133,17 +134,54 @@
               window.location.href = '../login.html?logout_success=1';
             } else {
               // Fallback redirect if server response isn't successful
+                window.location.href = '../login.html';
+              }
+            })
+            .catch(error => {
+              console.error('Logout error:', error);
+              // Fallback redirect on error
               window.location.href = '../login.html';
-            }
-          })
-          .catch(error => {
-            console.error('Logout error:', error);
-            // Fallback redirect on error
-            window.location.href = '../login.html';
-          });
-      }
-    };
+            });
+        }
+      };
 
+    // Add token validation on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Redirect to login page if no token exists
+        window.location.href = '../login.html';
+      }
+    });
+
+    // DOM ready handler
+    document.addEventListener('DOMContentLoaded', function () {
+      const headerRight = document.querySelector('.header-right');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+
+      headerRight.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default anchor behavior
+        dropdownMenu.classList.toggle('show');
+      });
+
+      // Close the dropdown when clicking outside
+      window.addEventListener('click', function (e) {
+        if (!headerRight.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+
+      // Handle dropdown links
+      const dropdownLinks = dropdownMenu.querySelectorAll('a');
+      dropdownLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.stopPropagation(); // Prevent event bubbling
+        });
+      });
+    });
+  </script>
+
+  <script>
     // Add token validation on page load
     document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('token');
