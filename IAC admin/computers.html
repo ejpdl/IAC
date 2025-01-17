@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="assets/css/sidebar-header.css">
   <link rel="stylesheet" href="assets/css/page-content.css">
   <link rel="stylesheet" href="assets/css/computers.css">
-  
+
 </head>
 
 <style>
@@ -65,7 +65,7 @@
             <button type="button" id="sidebarCollapse" class="btn btn-info">
               <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="admin_profile.php">
+            <a class="navbar-brand">
               <div class="header-right">
                 <a href="#">
                   <i class="fas fa-user"></i>
@@ -75,9 +75,6 @@
                 <i class="fas fa-chevron-down"></i>
                 <!-- Dropdown Menu -->
                 <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item profile" href="admin_profile.php">Profile</a>
-                  </li>
                   <li>
                     <a class="dropdown-item logout" href="#" onclick="confirmLogout()">Log Out</a>
                   </li>
@@ -345,11 +342,38 @@
             sessionEndModal.show();
 
             // Here you would typically also make an AJAX call to update the backend
-            // about the session being ended
+            // about the session being ended. Let's assume this happens here.
+
+            // Simulating an AJAX request and then auto-reloading the page.
+            setTimeout(() => {
+              // Close the notification modal when done
+              const sessionEndNotificationModal = bootstrap.Modal.getInstance(document.getElementById('sessionEndNotificationModal'));
+              sessionEndNotificationModal.hide();
+
+              // Reload the page after the modal closes
+              location.reload();  // This will refresh the page and clear any overlay
+            }, 2000); // Adjust this delay as needed, this simulates waiting for the AJAX to complete.
+          });
+        }
+
+        // Handle closing of the alert box (success/error)
+        const successAlert = document.getElementById('successAlert');
+        const errorAlert = document.getElementById('errorAlert');
+
+        if (successAlert) {
+          successAlert.addEventListener('closed.bs.alert', function () {
+            location.reload();  // Reload page when alert is closed
+          });
+        }
+
+        if (errorAlert) {
+          errorAlert.addEventListener('closed.bs.alert', function () {
+            location.reload();  // Reload page when alert is closed
           });
         }
       });
     </script>
+
 
 </body>
 
