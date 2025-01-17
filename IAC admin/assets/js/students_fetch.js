@@ -13,7 +13,7 @@ async function loadData() {
 
   try {
 
-    const response = await fetch(`https://iac-admin-api.onrender.com/admin/details`, {
+    const response = await fetch(`http://127.0.0.1:4000/admin/details`, {
 
       method: 'GET',
       headers: {
@@ -59,7 +59,7 @@ async function editStudent(Student_ID) {
 
   try{
 
-    const response = await fetch(`https://iac-admin-api.onrender.com/list/students/${Student_ID}`, {
+    const response = await fetch(`http://127.0.0.1:4000/list/students/${Student_ID}`, {
 
       method: 'GET',
       headers: {
@@ -115,7 +115,7 @@ async function editStudent(Student_ID) {
 
       try{
 
-        const updateResponse = await fetch(`https://iac-admin-api.onrender.com/update/student/`, {
+        const updateResponse = await fetch(`http://127.0.0.1:4000/update/student/`, {
 
           method: 'PUT',
           headers: {
@@ -172,7 +172,7 @@ async function confirmDeleteStudent(){
   const token = localStorage.getItem("token");
 
   try {
-      const response = await fetch(`https://iac-admin-api.onrender.com/delete/student/${Student_ID}`, {
+      const response = await fetch(`http://127.0.0.1:4000/delete/student/${Student_ID}`, {
           method: 'DELETE',
           headers: {
               'Authorization': token

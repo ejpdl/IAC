@@ -41,34 +41,43 @@ const connection = mysql.createPool({
 
 });
 
+connection.getConnection((err, conn) => {
+    if (err) {
+        console.error("Error connecting to the database:", err.message);
+    } else {
+        console.log("Successfully connected to the database!");
+        conn.release(); // Release the connection back to the pool
+    }
+});
+
 //PINGER TO AVOID SERVER SLEEP
 // Cron job to keep the server alive
-const job = new cron.CronJob('*/1 * * * *', function () {
-    console.log('Pinging server to keep it alive');
-    https.get('https://iac-admin-api.onrender.com/ping', (res) => {
-        if (res.statusCode === 200) {
-            console.log('Server pinged successfully');
-        } else {
-            console.error(`Failed to ping server.Status code: ${res.statusCode}`);
-        }
-    }).on('error', (err) => {
-        console.error('Error pinging server:', err.message);
-    });
+// const job = new cron.CronJob('*/1 * * * *', function () {
+//     console.log('Pinging server to keep it alive');
+//     https.get('http://127.0.0.1:4000/ping', (res) => {
+//         if (res.statusCode === 200) {
+//             console.log('Server pinged successfully');
+//         } else {
+//             console.error(`Failed to ping server.Status code: ${res.statusCode}`);
+//         }
+//     }).on('error', (err) => {
+//         console.error('Error pinging server:', err.message);
+//     });
 
-    // After 30 seconds, ping the server again
-    setTimeout(() => {
-        console.log('Pinging server after 30 seconds...');
-        https.get('https://iac-admin-api.onrender.com/ping', (res) => {
-            if (res.statusCode === 200) {
-                console.log('Server pinged successfully');
-            } else {
-                console.error(`Failed to ping server. Status code: ${res.statusCode}`);
-            }
-        }).on('error', (err) => {
-            console.error('Error pinging server:', err.message);
-        });
-    }, 30000);  // 30000 ms = 30 seconds
-});
+//     // After 30 seconds, ping the server again
+//     setTimeout(() => {
+//         console.log('Pinging server after 30 seconds...');
+//         https.get('http://127.0.0.1:4000/ping', (res) => {
+//             if (res.statusCode === 200) {
+//                 console.log('Server pinged successfully');
+//             } else {
+//                 console.error(`Failed to ping server. Status code: ${res.statusCode}`);
+//             }
+//         }).on('error', (err) => {
+//             console.error('Error pinging server:', err.message);
+//         });
+//     }, 30000);  // 30000 ms = 30 seconds
+// });
 
 app.get("/ping", (req, res) => {
     res.status(200).send("Server is alive");
@@ -1084,11 +1093,11 @@ app.delete(`/delete/student/:Student_ID`, verifyToken, async (req, res) => {
     });
 
 });
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
 
     console.log(`Server is running at PORT ${PORT}`);
-    job.start();
+    // job.start();
 
 })
