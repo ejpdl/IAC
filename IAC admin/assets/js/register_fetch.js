@@ -30,7 +30,7 @@ register.addEventListener('submit', async (event) => {
 
     try {
 
-        const response = await fetch(`https://iac-admin-api.onrender.com/register/admin`, {
+        const response = await fetch(`http://127.0.0.1:4000/register/admin`, {
 
             method: 'POST',
             headers: {

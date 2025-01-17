@@ -2,8 +2,8 @@ const express = require('express');
 const mysql = require('mysql');
 const moment = require('moment');
 const cors = require('cors');
-// const cron = require('cron');
-// const https = require('https');
+const cron = require('cron');
+const https = require('https');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -28,49 +28,33 @@ const logger = (req, res, next) => {
 
 app.use(logger);
 
-const connection = mysql.createConnection({
+const connection = mysql.createPool({
 
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "internet_access_center"
-
+    host: "srv545.hstgr.io",
+    user: "u579076463_iacmonitoring",
+    password: "Iacmonitoring@2024",
+    // database: "internet_access_center"
+    database: "u579076463_iacmonitoring",
+    waitForConnections: true,
+    connectionLimit: 10,
+    multipleStatements: true
 
 });
 
-connection.connect((err) => {
-
-    if(err){
-
-        console.log(`Error Connecting on the database MYSQL: ${err}`);
-        return;
-
-    }else{
-
-        console.log(`Successfully Connected to ${connection.config.database}`);
-
+connection.getConnection((err, conn) => {
+    if (err) {
+        console.error("Error connecting to the database:", err.message);
+    } else {
+        console.log("Successfully connected to the database!");
+        conn.release(); // Release the connection back to the pool
     }
-
 });
-
-// const connection = mysql.createPool({
-
-//     host: "srv545.hstgr.io",
-//     user: "u579076463_iacmonitoring",
-//     password: "Iacmonitoring@2024",
-//     // database: "internet_access_center"
-//     database: "u579076463_iacmonitoring",
-//     waitForConnections: true,
-//     connectionLimit: 10,
-//     multipleStatements: true
-
-// });
 
 //PINGER TO AVOID SERVER SLEEP
 // Cron job to keep the server alive
 // const job = new cron.CronJob('*/1 * * * *', function () {
 //     console.log('Pinging server to keep it alive');
-//     https.get('https://iac-admin-api.onrender.com/ping', (res) => {
+//     https.get('http://127.0.0.1:4000/ping', (res) => {
 //         if (res.statusCode === 200) {
 //             console.log('Server pinged successfully');
 //         } else {
@@ -83,7 +67,7 @@ connection.connect((err) => {
 //     // After 30 seconds, ping the server again
 //     setTimeout(() => {
 //         console.log('Pinging server after 30 seconds...');
-//         https.get('https://iac-admin-api.onrender.com/ping', (res) => {
+//         https.get('http://127.0.0.1:4000/ping', (res) => {
 //             if (res.statusCode === 200) {
 //                 console.log('Server pinged successfully');
 //             } else {
@@ -95,9 +79,9 @@ connection.connect((err) => {
 //     }, 30000);  // 30000 ms = 30 seconds
 // });
 
-// app.get("/ping", (req, res) => {
-//     res.status(200).send("Server is alive");
-// });
+app.get("/ping", (req, res) => {
+    res.status(200).send("Server is alive");
+});
 
 // FOR AUTHENTICATION AND AUTHORIZATION
 const verifyToken = async (req, res, next) => {
@@ -884,8 +868,6 @@ app.get(`/admin/view-all-students`, verifyToken, async (req, res) => {
 
 });
 
-
-
 // Backend Express Route
 app.get('/api/year-level-usage/:month/:year', (req, res) => {
     const { month, year } = req.params;
@@ -1111,10 +1093,7 @@ app.delete(`/delete/student/:Student_ID`, verifyToken, async (req, res) => {
     });
 
 });
-
-
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
 

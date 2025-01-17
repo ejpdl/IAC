@@ -60,7 +60,7 @@ async function loadData() {
 
     try {
 
-        const response = await fetch(`https://iac-admin-api.onrender.com/admin/details`, {
+        const response = await fetch(`http://127.0.0.1:4000/admin/details`, {
 
             method: 'GET',
             headers: {
@@ -112,7 +112,7 @@ async function AvailablePc() {
 
     try {
 
-        const response = await fetch(`https://iac-admin-api.onrender.com/view_all/pc`, {
+        const response = await fetch(`http://127.0.0.1:4000/view_all/pc`, {
 
             method: 'GET',
             headers: {
@@ -161,7 +161,7 @@ async function SessionHistory() {
 
     try {
 
-        const response = await fetch(`https://iac-admin-api.onrender.com/admin/session-history`, {
+        const response = await fetch(`http://127.0.0.1:4000/admin/session-history`, {
 
             method: 'GET',
             headers: {
@@ -223,7 +223,7 @@ async function EditAdmin(Admin_ID) {
 
     try {
 
-        const response = await fetch(`https://iac-admin-api.onrender.com/admin/view/${Admin_ID}`, {
+        const response = await fetch(`http://127.0.0.1:4000/admin/view/${Admin_ID}`, {
 
             method: 'GET',
             headers: {
@@ -285,7 +285,7 @@ async function EditAdmin(Admin_ID) {
 
             try {
 
-                const updateResponse = await fetch(`https://iac-admin-api.onrender.com/admin/update-info`, {
+                const updateResponse = await fetch(`http://127.0.0.1:4000/admin/update-info`, {
 
                     method: 'PUT',
                     headers: {

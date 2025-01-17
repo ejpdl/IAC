@@ -60,7 +60,7 @@ async function loadData() {
 
   try {
 
-    const response = await fetch(`https://iac-admin-api.onrender.com/admin/details`, {
+    const response = await fetch(`http://127.0.0.1:4000/admin/details`, {
 
       method: 'GET',
       headers: {
@@ -108,7 +108,7 @@ async function addComputers() {
     PC_ID: document.querySelector(`#computerName`).value
   }
   try {
-    const response = await fetch(`https://iac-admin-api.onrender.com/add/pc`, {
+    const response = await fetch(`http://127.0.0.1:4000/add/pc`, {
       method: 'POST',
       headers: {
         'Authorization': token,
@@ -168,7 +168,7 @@ async function deleteComputers() {
   };
 
   try {
-    const response = await fetch(`https://iac-admin-api.onrender.com/delete/pc`, {
+    const response = await fetch(`http://127.0.0.1:4000/delete/pc`, {
       method: 'POST',
       headers: {
         'Authorization': token,
@@ -229,7 +229,7 @@ const token = localStorage.getItem('token');
 // Fetch data from the API and render cards
 async function fetchAndRenderPCList() {
   try {
-    const response = await fetch("https://iac-admin-api.onrender.com/view_all/pc", {
+    const response = await fetch("http://127.0.0.1:4000/view_all/pc", {
       method: "GET",
       headers: {
         "Authorization": token,
@@ -280,7 +280,7 @@ async function fetchAndRenderPCList() {
 // Function to handle PC request response (accept/decline)
 async function handleRequestResponse(pcId, action) {
   try {
-    const response = await fetch('https://iac-admin-api.onrender.com/api/request-response', {
+    const response = await fetch('http://127.0.0.1:4000/api/request-response', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -325,7 +325,7 @@ async function handleRequestResponse(pcId, action) {
 // Function to load PC status
 async function loadPCStatus() {
   try {
-    const response = await fetch('https://iac-admin-api.onrender.com/api/pc-status');
+    const response = await fetch('http://127.0.0.1:4000/api/pc-status');
     const data = await response.json();
 
     if (!response.ok) {
@@ -480,7 +480,7 @@ const PCTimer = {
     this.stopTimer(pcId);
 
     try {
-      const response = await fetch(`https://iac-admin-api.onrender.com/api/pc-time/${pcId}`);
+      const response = await fetch(`http://127.0.0.1:4000/api/pc-time/${pcId}`);
       const data = await response.json();
 
       if (!data.isActive) {
@@ -490,7 +490,7 @@ const PCTimer = {
 
       const updateDisplay = () => {
         // Fetch current remaining time from backend each interval
-        fetch(`https://iac-admin-api.onrender.com/api/pc-time/${pcId}`)
+        fetch(`http://127.0.0.1:4000/api/pc-time/${pcId}`)
           .then(response => response.json())
           .then(data => {
             if (!data.isActive || data.remainingTime <= 0) {
@@ -547,7 +547,7 @@ function showAlert(message, type) {
 
 async function handleEndSession(pcId) {
   try {
-    const response = await fetch('https://iac-admin-api.onrender.com/api/end-session', {
+    const response = await fetch('http://127.0.0.1:4000/api/end-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -579,7 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Check for expired sessions every minute!
   setInterval(async () => {
     try {
-      await fetch('https://iac-admin-api.onrender.com/api/check-expired-sessions');
+      await fetch('http://127.0.0.1:4000/api/check-expired-sessions');
     } catch (error) {
       console.error('Error checking expired sessions:', error);
     }

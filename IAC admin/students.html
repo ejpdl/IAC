@@ -8,7 +8,6 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel = "icon" href = "assets/images/logo.png">
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="assets/css/sidebar-header.css">
   <link rel="stylesheet" href="assets/css/page-content.css">
@@ -170,7 +169,7 @@
                 <option value="BS in Accountancy">BS in Accountancy</option>
                 <option value="BS in Hospitality Management">BS in Hospitality Management</option>
                 <option value="BS in Tourism Management">BS in Tourism Management</option>
-                <option value="BS in Comuter Science">BS in Comuter Science</option>
+                <option value="BS in Computer Science">BS in Computer Science</option>
                 <option value="BA in Pyschology">BA in Pyschology</option>
                 <option value="BS in Computer Engineering">BS in Computer Engineering</option>
                 <option value="BS in Business Administration">BS in Business Administration</option>
@@ -221,46 +220,45 @@
     </div>
   </div>
 
-  <script src="assets/js/fetchs/students_fetch.js"></script>
+  <script src="assets/js/students_fetch.js"></script>
   <script src="assets/js/sidebar.js"></script>
   <script src="assets/js/header.js"></script>
-
   <script>
     function confirmLogout() {
-        // Ask for confirmation before proceeding with logout
-        var confirmation = confirm("Are you sure you want to log out?");
-        if (confirmation) {
-          // Clear localStorage to invalidate the session
-          localStorage.removeItem('token');
-          localStorage.removeItem('adminId');
+      // Ask for confirmation before proceeding with logout
+      var confirmation = confirm("Are you sure you want to log out?");
+      if (confirmation) {
+        // Clear localStorage to invalidate the session
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminId');
 
-          // Notify the server about the logout and redirect to login page
-          fetch('?ajax_logout=true')
-            .then(response => response.json())
-            .then(data => {
-              if (data.status === 'success') {
-                // Redirect to login page
-                window.location.href = '../login.html?logout_success=1';
-              } else {
-                // Fallback redirect if server response isn't successful
-                window.location.href = '../login.html';
-              }
-            })
-            .catch(error => {
-              console.error('Logout error:', error);
-              // Fallback redirect on error
+        // Notify the server about the logout and redirect to login page
+        fetch('?ajax_logout=true')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Redirect to login page
+              window.location.href = '../login.html?logout_success=1';
+            } else {
+              // Fallback redirect if server response isn't successful
               window.location.href = '../login.html';
-            });
-        }
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            // Fallback redirect on error
+            window.location.href = '../login.html';
+          });
       }
+    };
 
-      // Add token validation on page load
-      document.addEventListener('DOMContentLoaded', () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-          // Redirect to login page if no token exists
-          window.location.href = '../login.html';
-        }
+    // Add token validation on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Redirect to login page if no token exists
+        window.location.href = '../login.html';
+      }
       });
 
     // DOM ready handler
@@ -300,7 +298,7 @@
 
       const token = localStorage.getItem('token');
       try {
-        const response = await fetch('http://localhost:3000/admin/view-all-students', {
+        const response = await fetch('http://127.0.0.1:4000/admin/view-all-students', {
 
           method: 'GET',
           headers: {
