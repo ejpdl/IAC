@@ -1032,36 +1032,76 @@ app.get(`/list/students/:Student_ID`, verifyToken, async (req, res) => {
 
 // UPDATE A STUDENT
 app.put(`/update/student`, verifyToken, async (req, res) => {
-    
+
     const { first_name, last_name, year_level, course, password, Student_ID } = req.body;
 
     try{
 
-        const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?, password = ? WHERE Student_ID = ?`;
+        if(password){
 
-        connection.query(query, [first_name, last_name, year_level, course, password, Student_ID], (err, results) => {
-            
-            if(err){
+            const salt = 10;
 
-                return res.status(500).json({ error: err.message });
+            bcrypt.hash(password, salt, (err, hashed) => {
 
-            }
+                if(err){
 
-            if (results.affectedRows === 0) {
+                    return res.status(500).json({ message: "Error hashing password" });
+
+                }
                 
-                return res.status(404).json({ error: `No record found to update.` });
-            
-            }
+                const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ?, password = ? WHERE Student_ID = ?`;
 
-            console.log(`Successfully updated User with Student ID: ${Student_ID}`);
-            res.status(200).json({ msg: `Successfully Updated!` });
+                connection.query(query, [first_name, last_name, year_level, course, hashed, Student_ID], (err, results) => {
 
-        });
+                    if(err){
+
+                        return res.status(500).json({ error: err.message });
+
+                    }
+
+                    if(results.affectedRows === 0){
+
+                        return res.status(404).json({ error: `No record found to update.` });
+
+                    }
+
+                    console.log(`Successfully updated User with Student ID: ${Student_ID}`);
+                    res.status(200).json({ msg: `Successfully Updated!` });
+
+                });
+
+            });
+
+        }else{
+
+            // If no password provided, update other fields only
+            const query = `UPDATE students SET first_name = ?, last_name = ?, year_level = ?, course = ? WHERE Student_ID = ?`;
+
+            connection.query(query, [first_name, last_name, year_level, course, Student_ID], (err, results) => {
+
+                if(err){
+
+                    return res.status(500).json({ error: err.message });
+
+                }
+                if(results.affectedRows === 0){
+
+                    return res.status(404).json({ error: `No record found to update.` });
+
+                }
+
+                console.log(`Successfully updated User with Student ID: ${Student_ID}`);
+                res.status(200).json({ msg: `Successfully Updated!` });
+
+            });
+
+        }
 
     }catch(error){
-        
-        console.log(error)
-    
+
+        console.log(error);
+        res.status(500).json({ error: "Error updating student" });
+
     }
 
 });

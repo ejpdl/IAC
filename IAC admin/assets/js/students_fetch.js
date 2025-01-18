@@ -78,7 +78,10 @@ async function editStudent(Student_ID) {
       document.querySelector(`#editLastName`).value = data.last_name;
       document.querySelector(`#editYearLevel`).value = data.year_level;
       document.querySelector(`#editCourse`).value = data.course;
-      document.querySelector(`#editPassword`).value = data.password;
+      document.querySelector(`#editPassword`).value = '';
+      // Add placeholder to indicate password behavior
+      document.querySelector(`#editPassword`).placeholder = 'Enter new password (leave blank to keep current)';
+      
 
       document.querySelector(`#editStudentId`).value = data.Student_ID;
 
@@ -101,6 +104,8 @@ async function editStudent(Student_ID) {
     edit_information.onclick = async (e) => {
 
       e.preventDefault();
+      const newPassword = document.querySelector(`#editPassword`).value;
+            
 
       const newData = {
 
@@ -108,10 +113,13 @@ async function editStudent(Student_ID) {
         last_name: document.querySelector(`#editLastName`).value,
         year_level: document.querySelector(`#editYearLevel`).value,
         course: document.querySelector(`#editCourse`).value,
-        password: document.querySelector(`#editPassword`).value,
         Student_ID: document.querySelector(`#editStudentId`).value
 
       };
+
+      if (newPassword.trim()) {
+        newData.password = newPassword;
+    }
 
       try{
 
