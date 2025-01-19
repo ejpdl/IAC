@@ -211,7 +211,7 @@
       const year = document.getElementById('yearSelector').value;
 
       // Replace this URL with your actual API endpoint
-      fetch(`http://192.168.0.1:3000/api/year-level-usage/${month}/${year}`)
+      fetch(`http://127.0.0.1:4000/api/year-level-usage/${month}/${year}`)
         .then(response => response.json())
         .then(data => {
           // Update table

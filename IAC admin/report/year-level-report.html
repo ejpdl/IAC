@@ -121,7 +121,7 @@
       // Fetch and update both table and chart
       const fetchDepartmentUsageData = async (month, year) => {
         try {
-          const response = await fetch(`http://192.168.0.1:3000/api/department-usage?month=${month}&year=${year}`);
+          const response = await fetch(`http://127.0.0.1:4000/api/department-usage?month=${month}&year=${year}`);
           const data = await response.json();
 
           // Update table

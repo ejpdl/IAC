@@ -53,10 +53,11 @@ class _LoginScreenState extends State<LoginScreen> {
           await prefs.setString('authToken', token); // Save the token
           await prefs.setString('studentId', sid); // Save the student ID
 
-          // Navigate to homepage
-          Navigator.pushReplacement(
+          // Navigate to homepage and clear stack
+          Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const Homepage()),
+            (Route<dynamic> route) => false,
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="assets/css/sidebar-header.css">
   <link rel="stylesheet" href="assets/css/page-content.css">
   <link rel="stylesheet" href="assets/css/history.css">
-  
+
 </head>
 
 <body>
@@ -49,6 +49,12 @@
                 <h8><i class="fas fa-users icon-size"></i> <span class="ms-1">Student</span></h8>
               </a>
             </li>
+            <li>
+              <a href="about-us.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-info-circle icon-size"></i> <span class="ms-1">About</span>
+                </h8>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -69,9 +75,6 @@
                 <i class="fas fa-chevron-down"></i>
                 <!-- Dropdown Menu -->
                 <ul class="dropdown-menu">
-                  <li>
-                    <a class="dropdown-item profile" href="admin_profile.php">Profile</a>
-                  </li>
                   <li>
                     <a class="dropdown-item logout" href="#" onclick="confirmLogout()">Log Out</a>
                   </li>
@@ -106,6 +109,30 @@
 
               </tbody>
             </table>
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <select id="rowsPerPage" class="form-select form-select-sm w-auto" onchange="updatePagination()">
+                  <option value="5">5 rows</option>
+                  <option value="10" selected>10 rows</option>
+                  <option value="15">15 rows</option>
+                  <option value="20">20 rows</option>
+                </select>
+              </div>
+              <nav>
+                <ul class="pagination mb-0">
+                  <li class="page-item" id="prevPage">
+                    <a class="page-link" href="#" onclick="changePage(-1)">Previous</a>
+                  </li>
+                  <li class="page-item disabled" id="pageInfo">
+                    <span class="page-link" id="currentPageDisplay">Page 1 of 1</span>
+                  </li>
+                  <li class="page-item" id="nextPage">
+                    <a class="page-link" href="#" onclick="changePage(1)">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+
           </div>
         </div>
       </div>
@@ -134,16 +161,16 @@
               window.location.href = '../login.html?logout_success=1';
             } else {
               // Fallback redirect if server response isn't successful
-                window.location.href = '../login.html';
-              }
-            })
-            .catch(error => {
-              console.error('Logout error:', error);
-              // Fallback redirect on error
               window.location.href = '../login.html';
-            });
-        }
-      };
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            // Fallback redirect on error
+            window.location.href = '../login.html';
+          });
+      }
+    };
 
     // Add token validation on page load
     document.addEventListener('DOMContentLoaded', () => {

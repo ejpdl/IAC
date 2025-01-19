@@ -8,6 +8,7 @@ import 'dart:convert';
 import 'computerpage.dart';
 import 'historypage.dart';
 import 'ManageProfilePage.dart';
+import 'about_us.dart';
 
 void main() {
   runApp(MyApp());
@@ -43,6 +44,7 @@ class _HomepageState extends State<Homepage> {
     ComputerPage(),
     HistoryPage(),
     ManageProfilePage(),
+    AboutUs(),
   ];
 
   // This ensures we go directly to the home page after sign-in
@@ -69,6 +71,7 @@ class _HomepageState extends State<Homepage> {
           FluidNavBarIcon(icon: Icons.computer_sharp),
           FluidNavBarIcon(icon: Icons.history),
           FluidNavBarIcon(icon: Icons.settings),
+          FluidNavBarIcon(icon: Icons.question_mark),
         ],
         onChange: _handleNavigationChange,
         style: const FluidNavBarStyle(
@@ -114,7 +117,8 @@ class _HomePageState extends State<HomePage> {
       }
 
       final response = await http.get(
-        Uri.parse('https://flutterapi-q64f.onrender.com/userdata/student/$studentId'),
+        Uri.parse(
+            'https://flutterapi-q64f.onrender.com/userdata/student/$studentId'),
       );
 
       if (response.statusCode == 200) {
