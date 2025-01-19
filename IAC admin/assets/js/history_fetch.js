@@ -71,8 +71,16 @@ async function SessionHistory() {
 
         sessionHistory = await response.json();
 
-        // Sort sessions by date_used in descending order
-        sessionHistory.sort((a, b) => new Date(b.date_used) - new Date(a.date_used));
+        // Sort sessions by date_used and time_used in descending order
+        sessionHistory.sort((a, b) => {
+            const dateComparison = new Date(b.date_used) - new Date(a.date_used);
+            if (dateComparison !== 0) return dateComparison;
+
+            // Combine date and time for accurate comparison
+            const dateA = new Date(`${a.date_used}T${a.time_used}`);
+            const dateB = new Date(`${b.date_used}T${b.time_used}`);
+            return dateB - dateA;
+        });
 
         // Render the current page
         renderPage(currentPage);
