@@ -7,12 +7,12 @@
   <title>Student</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel = "icon" href = "assets/images/logo.png">
+  <link rel="icon" href="assets/images/logo.png">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" href="assets/css/sidebar-header.css">
   <link rel="stylesheet" href="assets/css/page-content.css">
   <link rel="stylesheet" href="assets/css/history.css">
-  
+
 </head>
 
 <body>
@@ -46,6 +46,12 @@
             <li>
               <a href="students.html" class="nav-link px-0 align-middle text-white">
                 <h8><i class="fas fa-users icon-size"></i> <span class="ms-1">Student</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="about-us.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-info-circle icon-size"></i> <span class="ms-1">About</span>
+                </h8>
               </a>
             </li>
 
@@ -187,8 +193,8 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-danger" style="background-color: maroon !important;"
-            id = "editbutton">Save Changes</button>
+          <button type="button" class="btn btn-danger" style="background-color: maroon !important;" id="editbutton">Save
+            Changes</button>
         </div>
       </div>
     </div>
@@ -256,7 +262,7 @@
         // Redirect to login page if no token exists
         window.location.href = '../login.html';
       }
-      });
+    });
 
     // DOM ready handler
     document.addEventListener('DOMContentLoaded', function () {
@@ -284,7 +290,7 @@
       });
     });
   </script>
-  
+
   <script>
     let studentsData = [];
     let filteredData = [];
@@ -392,9 +398,9 @@
     });
 
     // Function to open edit modal
-    
+
   </script>
-  
+
 </body>
 
 </html>

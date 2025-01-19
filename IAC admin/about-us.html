@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - IAC Attendance Monitoring App</title>
+  <link rel="icon" href="assets/images/logo.png">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <link rel="stylesheet" href="assets/css/sidebar-header.css">
+  <link rel="stylesheet" href="assets/css/page-content.css">
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row flex-nowrap">
+      <!-- Sidebar -->
+      <div class="col-auto p-0 bg-dark" id="sidebar">
+        <div class="d-flex flex-column align-items-center align-items-sm-start text-white min-vh-100">
+          <div class="logo-container">
+            <img src="assets/images/logo.png" alt="Logo" class="logo">
+            <a href="dashboard.html"
+              class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none admin-title">
+              <span class="fs-5">Menu</span>
+            </a>
+          </div>
+          <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            <li>
+              <a href="dashboard.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-tachometer-alt icon-size"></i> <span class="ms-1">Dashboard</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="computers.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-desktop-alt icon-size"></i> <span class="ms-1">Computers</span></h8>
+              </a>
+            </li>
+            <li>
+              <a href="history.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-clock icon-size"></i> <span class="ms-1">History</span>
+                </h8>
+              </a>
+            </li>
+            <li>
+              <a href="students.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-users icon-size"></i> <span class="ms-1">Student</span>
+                </h8>
+              </a>
+            </li>
+            <li>
+              <a href="about-us.html" class="nav-link px-0 align-middle text-white">
+                <h8><i class="fas fa-info-circle icon-size"></i> <span class="ms-1">About</span>
+                </h8>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- End Sidebar -->
+
+      <div class="col p-0">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-light custom-navbar">
+          <div class="container-fluid">
+            <button type="button" id="sidebarCollapse" class="btn btn-info">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand">
+              <div class="header-right">
+                <a href="#">
+                  <i class="fas fa-user" style="color: #800000;"></i>
+                  <span class="account-name" id="account-name">Username</span>
+                </a>
+                <i class="fas fa-chevron-down" style="color: #800000;"></i>
+                <!-- Dropdown Menu -->
+                <ul class="dropdown-menu">
+                  <li>
+                    <a class="dropdown-item logout" href="#" onclick="confirmLogout()">Log Out</a>
+                  </li>
+                </ul>
+              </div>
+            </a>
+          </div>
+        </nav>
+        <!-- End Header -->
+
+        <!-- Page Content -->
+        <div class="container-fluid page-content mt-3">
+          <div class="row flex-nowrap">
+            <div class="container-fluid py-4">
+              <h2 class="text-center mb-4 fs-1">About IAC Monitoring System</h2>
+              <p class="lead text-center fs-6">The IAC Monitoring System is designed to efficiently monitor and manage
+                student usage of computers in the Internet Access Control (IAC) Laboratory. It ensures that computers
+                are used primarily for academic and research purposes while providing real-time data and insights into
+                student activity.</p>
+              <p class="lead text-center fs-6">The system includes a mobile application for students, allowing them to
+                easily check the availability of computers. Students can view whether a computer is available, occupied,
+                or pending request. This makes it convenient for users to plan their time in the lab efficiently.</p>
+              <p class="lead text-center fs-6">On the administrative side, the system features a web-based platform that
+                helps administrators manage student requests, track session histories, and monitor overall lab usage.
+                The admin interface also includes a dashboard with graphs, diagrams, and charts to provide detailed
+                analytics on computer usage, helping to improve lab management and ensure fair access for all students.
+              </p>
+              <p class="lead text-center fs-6">Overall, the IAC Monitoring System streamlines the process of managing
+                computer resources, improves access control, and offers valuable data for analysis and system
+                optimization.</p>
+
+              <!-- Team Section -->
+              <div class="row">
+                <h4 class="text-center mb-4 fs-3">Meet Our Team</h4>
+
+                <!-- Team Member 1 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-laptop-code me-2" style="color: #800000;"></i>Ephraim
+                        Justine Paul D. De Lara</h5>
+                      <p class="card-text" style="color: #800000;">Backend Developer & API Integration Specialist</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 2 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-project-diagram me-2" style="color: #800000;"></i>Franze
+                        William M. Calleja</h5>
+                      <p class="card-text" style="color: #800000;">Project Manager & UI/UX Designer</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 3 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-laptop me-2" style="color: #800000;"></i>Ralph Jahred D.
+                        Magpantay</h5>
+                      <p class="card-text" style="color: #800000;">Backend Developer</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 4 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-database me-2" style="color: #800000;"></i>Albert Ian D.
+                        Abarquez</h5>
+                      <p class="card-text" style="color: #800000;">Database Manager & API Integration Specialist</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 5 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-paint-brush me-2" style="color: #800000;"></i>Mike
+                        Lawrence M. Cuevas</h5>
+                      <p class="card-text" style="color: #800000;">UI/UX Designer & Frontend Developer</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 6 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-code me-2" style="color: #800000;"></i>John Aldrin C.
+                        Ordiales</h5>
+                      <p class="card-text" style="color: #800000;">Frontend Developer</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 7 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-clipboard-check me-2" style="color: #800000;"></i>Myla M.
+                        Bacayan</h5>
+                      <p class="card-text" style="color: #800000;">Tester/QA Specialist & Documentation Specialist</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 8 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-database me-2" style="color: #800000;"></i>Jon Robin Ace
+                        E. Andor</h5>
+                      <p class="card-text" style="color: #800000;">Database Manager</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 9 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-book me-2" style="color: #800000;"></i>Jervy A. Laroza
+                      </h5>
+                      <p class="card-text" style="color: #800000;">Documentation Specialist</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Member 10 -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h5 class="card-title"><i class="fas fa-check-circle me-2" style="color: #800000;"></i>Hazel Grace
+                        D. Patron</h5>
+                      <p class="card-text" style="color: #800000;">Tester/QA Specialist</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <!-- End Team Section -->
+
+            </div>
+          </div>
+        </div>
+        <!-- End Page Content -->
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/students_fetch.js"></script>
+  <script src="assets/js/sidebar.js"></script>
+  <script src="assets/js/header.js"></script>
+  <script>
+    function confirmLogout() {
+      // Ask for confirmation before proceeding with logout
+      var confirmation = confirm("Are you sure you want to log out?");
+      if (confirmation) {
+        // Clear localStorage to invalidate the session
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminId');
+
+        // Notify the server about the logout and redirect to login page
+        fetch('?ajax_logout=true')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'success') {
+              // Redirect to login page
+              window.location.href = '../login.html?logout_success=1';
+            } else {
+              // Fallback redirect if server response isn't successful
+              window.location.href = '../login.html';
+            }
+          })
+          .catch(error => {
+            console.error('Logout error:', error);
+            // Fallback redirect on error
+            window.location.href = '../login.html';
+          });
+      }
+    };
+
+    // Add token validation on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Redirect to login page if no token exists
+        window.location.href = '../login.html';
+      }
+    });
+
+    // DOM ready handler
+    document.addEventListener('DOMContentLoaded', function () {
+      const headerRight = document.querySelector('.header-right');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+
+      headerRight.addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent default anchor behavior
+        dropdownMenu.classList.toggle('show');
+      });
+
+      // Close the dropdown when clicking outside
+      window.addEventListener('click', function (e) {
+        if (!headerRight.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+
+      // Handle dropdown links
+      const dropdownLinks = dropdownMenu.querySelectorAll('a');
+      dropdownLinks.forEach(link => {
+        link.addEventListener('click', function (e) {
+          e.stopPropagation(); // Prevent event bubbling
+        });
+      });
+    });
+  </script>
+</body>
+
+</html>
